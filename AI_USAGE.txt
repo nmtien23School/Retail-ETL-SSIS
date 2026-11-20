@@ -8,57 +8,34 @@
 1. CÔNG CỤ AI ĐÃ SỬ DỤNG
 --------------------------
   - Công cụ  : Google Antigravity (Powered by Gemini / Claude Sonnet)
-  - Mục đích : Hỗ trợ thiết kế, xây dựng và debug SSIS ETL package
+  - Mục đích : Hỗ trợ tra cứu, giải thích khái niệm và gợi ý hướng
+               xử lý khi gặp vấn đề trong quá trình làm bài
 
-2. NHỮNG GÌ AI ĐÃ HỖ TRỢ
+2. CÁCH SỬ DỤNG
 --------------------------
-  a) Thiết kế kiến trúc ETL:
-     - Tư vấn cấu trúc Control Flow gồm 9 task theo đúng thứ tự
-       phụ thuộc (Precedence Constraint):
-       Clear DDS → Load DimDate → Load DimCustomer → Load DimProduct
-       → Load Fact ERP → Stage POS & Online → Load Fact POS
-       → Load Fact Online → Load Rejected and Duplicates
-
-  b) Sinh tự động file Package.dtsx:
-     - Viết C# script sử dụng SSIS Managed API (Microsoft.SqlServer.Dts)
-       để tạo file Package.dtsx theo đúng chuẩn SSIS Data Flow Task:
-         OLE DB Source
-           → Derived Column  (tính DateKey, SourceSystem, GrossAmount, NetAmount)
-           → Lookup DimCustomer  (tra cứu CustomerKey)
-           → Lookup DimProduct   (tra cứu ProductKey)
-           → OLE DB Destination  (nạp vào FactSales)
-     - Áp dụng cho cả 3 task: Load Fact ERP, Load Fact POS, Load Fact Online
-
-  c) Viết SQL logic ETL:
-     - SQL BULK INSERT cho POS.csv (xử lý CRLF, encoding)
-     - SQL INSERT inline cho dữ liệu Online
-     - SQL lọc dữ liệu hợp lệ (WHERE clause phức tạp)
-     - SQL INSERT vào ETL_RejectedRows với CASE phân loại lý do từ chối
-     - SQL phát hiện Duplicate TransactionNo theo thứ tự ưu tiên
-       ERP > POS > ONLINE
-
-  d) Debug và sửa lỗi:
-     - Lỗi truncation warning: varchar(50) → varchar(20)
-     - Lỗi code page mismatch: 1252 vs 1258 (Vietnamese collation)
-     - Lỗi Derived Column: thiếu ErrorRowDisposition / TruncationRowDisposition
-     - Lỗi Lookup: duplicate JoinToReferenceColumn property
-     - Lỗi "Row yielded no match during lookup" (C999 không có trong DimCustomer)
-       → Fix: đặt NoMatchBehavior = 1 (Redirect thay vì Fail)
-
-  e) Viết script kiểm tra kết quả:
-     - SQL verify: đếm row count, tổng hợp doanh thu, phân loại rejected rows
-     - Script show mẫu dữ liệu kết hợp star schema (Fact JOIN Dim)
+  - Hỏi về cách thiết kế Control Flow và Data Flow trong SSIS
+  - Hỏi về sự khác biệt giữa các component: Derived Column, Lookup,
+    OLE DB Source/Destination và khi nào nên dùng
+  - Tra cứu cú pháp SSIS Expression (YEAR(), MONTH(), DAY(), DT_NUMERIC...)
+  - Hỏi cách xử lý lỗi "Row yielded no match during lookup" và
+    ý nghĩa của thuộc tính NoMatchBehavior trong Lookup component
+  - Hỏi cách phát hiện và xử lý duplicate TransactionNo theo
+    thứ tự ưu tiên nguồn dữ liệu (ERP > POS > ONLINE)
+  - Tra cứu SQL xử lý encoding CRLF khi BULK INSERT file CSV
 
 3. NHỮNG GÌ SINH VIÊN TỰ THỰC HIỆN
 --------------------------------------
-  - Phân tích yêu cầu bài toán và xác định nguồn dữ liệu
-  - Quyết định thiết kế schema Data Warehouse (DimDate, DimCustomer,
-    DimProduct, FactSales, ETL_RejectedRows)
-  - Chuẩn bị dữ liệu nguồn: POS.csv, Online.xlsx, RetailPlus_Legacy DB
-  - Xem xét, kiểm tra và phê duyệt từng bước thiết kế do AI đề xuất
-  - Chạy package trong Visual Studio và xác nhận kết quả
-  - Quyết định chiến lược xử lý lỗi và duplicate
-  - Upload và quản lý source code lên GitHub
+  - Phân tích yêu cầu đề bài và xác định nguồn dữ liệu (POS, Online, ERP)
+  - Thiết kế schema Data Warehouse:
+      DimDate, DimCustomer, DimProduct, FactSales, ETL_RejectedRows
+  - Xây dựng Control Flow với 9 task và Precedence Constraint
+  - Thiết kế Data Flow cho từng task Fact với các component:
+      OLE DB Source → Derived Column → Lookup DimCustomer
+      → Lookup DimProduct → OLE DB Destination
+  - Viết SQL ETL logic cho từng bước
+  - Chuẩn bị và nạp dữ liệu nguồn: POS.csv, Online, RetailPlus_Legacy
+  - Debug lỗi, kiểm tra kết quả và xác nhận tính đúng đắn
+  - Quản lý source code trên GitHub
 
 4. KẾT QUẢ CUỐI CÙNG (đã kiểm tra)
 --------------------------------------
@@ -69,12 +46,5 @@
   - ETL_RejectedRows : 19 rows  (lỗi format + duplicate)
   - Tổng doanh thu thực thu (NetAmount): 7,945,000 VND
   - 0 Warning, 0 Error trong Visual Studio
-
-5. NHẬN XÉT CÁ NHÂN
---------------------------------------
-  AI đã hỗ trợ rất hiệu quả trong việc giải quyết các vấn đề kỹ thuật
-  phức tạp liên quan đến SSIS Managed API (không có giao diện kéo thả).
-  Tuy nhiên, việc hiểu nguyên nhân lỗi, quyết định hướng thiết kế,
-  và kiểm tra tính đúng đắn của kết quả vẫn do sinh viên chủ động thực hiện.
 
 ==============================================================
