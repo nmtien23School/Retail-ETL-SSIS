@@ -53,7 +53,37 @@
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
-          SQLTask:SqlStatementSource="DELETE FROM dbo.FactSales; DELETE FROM dbo.ETL_RejectedRows; DELETE FROM dbo.DimProduct; DELETE FROM dbo.DimCustomer; DELETE FROM dbo.DimDate; IF OBJECT_ID('dbo.Stage_POS', 'U') IS NULL CREATE TABLE dbo.Stage_POS (TransID varchar(50), SaleDate varchar(50), CustID varchar(50), SKU varchar(50), Qty varchar(50), Price varchar(50), DiscountVND varchar(50)); IF OBJECT_ID('dbo.Stage_Online', 'U') IS NULL CREATE TABLE dbo.Stage_Online (OrderNo varchar(50), OrderDate varchar(50), BuyerCode varchar(50), ItemCode varchar(50), Quantity varchar(50), UnitPrice varchar(50), DiscountPct varchar(50), Status varchar(50)); IF OBJECT_ID('dbo.Stage_ERP', 'U') IS NULL CREATE TABLE dbo.Stage_ERP (InvoiceID varchar(50), InvoiceDate datetime2, CustomerID varchar(50), ProductID varchar(50), QtySold varchar(50), SalePrice decimal(18,2), DiscountMoney decimal(18,2), Status varchar(50)); TRUNCATE TABLE dbo.Stage_POS; TRUNCATE TABLE dbo.Stage_Online; TRUNCATE TABLE dbo.Stage_ERP;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:SqlStatementSource="IF OBJECT_ID(N'dbo.ETL_FileConfig', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.ETL_FileConfig (
+        SourceSystem varchar(10) NOT NULL PRIMARY KEY,
+        FilePath nvarchar(4000) NOT NULL,
+        CONSTRAINT CK_ETL_FileConfig_SourceSystem CHECK (SourceSystem IN ('POS', 'ONLINE'))
+    );
+END;
+IF NOT EXISTS (SELECT 1 FROM dbo.ETL_FileConfig WHERE SourceSystem = 'POS')
+    INSERT dbo.ETL_FileConfig (SourceSystem, FilePath) VALUES ('POS', N'');
+IF NOT EXISTS (SELECT 1 FROM dbo.ETL_FileConfig WHERE SourceSystem = 'ONLINE')
+    INSERT dbo.ETL_FileConfig (SourceSystem, FilePath) VALUES ('ONLINE', N'');
+IF EXISTS (
+    SELECT 1
+    FROM (VALUES ('POS'), ('ONLINE')) AS required(SourceSystem)
+    LEFT JOIN dbo.ETL_FileConfig AS config ON config.SourceSystem = required.SourceSystem
+    WHERE NULLIF(LTRIM(RTRIM(config.FilePath)), N'') IS NULL
+)
+    THROW 51000, 'Configure POS and ONLINE paths in dbo.ETL_FileConfig before the full refresh.', 1;
+
+DELETE FROM dbo.FactSales;
+DELETE FROM dbo.ETL_RejectedRows;
+DELETE FROM dbo.DimProduct;
+DELETE FROM dbo.DimCustomer;
+DELETE FROM dbo.DimDate;
+IF OBJECT_ID('dbo.Stage_POS', 'U') IS NULL CREATE TABLE dbo.Stage_POS (TransID varchar(50), SaleDate varchar(50), CustID varchar(50), SKU varchar(50), Qty varchar(50), Price varchar(50), DiscountVND varchar(50));
+IF OBJECT_ID('dbo.Stage_Online', 'U') IS NULL CREATE TABLE dbo.Stage_Online (OrderNo varchar(50), OrderDate varchar(50), BuyerCode varchar(50), ItemCode varchar(50), Quantity varchar(50), UnitPrice varchar(50), DiscountPct varchar(50), Status varchar(50));
+IF OBJECT_ID('dbo.Stage_ERP', 'U') IS NULL CREATE TABLE dbo.Stage_ERP (InvoiceID varchar(50), InvoiceDate datetime2, CustomerID varchar(50), ProductID varchar(50), QtySold varchar(50), SalePrice decimal(18,2), DiscountMoney decimal(18,2), Status varchar(50));
+TRUNCATE TABLE dbo.Stage_POS;
+TRUNCATE TABLE dbo.Stage_Online;
+TRUNCATE TABLE dbo.Stage_ERP;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -943,7 +973,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -1101,7 +1131,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -1480,7 +1510,7 @@
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT CAST(InvoiceID AS varchar(20)) AS InvoiceID, InvoiceDate, CustomerID, ProductID, CAST(QtySold AS INT) AS Quantity, SalePrice AS UnitPrice, ISNULL(DiscountMoney, 0) AS DiscountAmount FROM dbo.ERP_Sales WHERE Status = 'Completed' AND TRY_CAST(QtySold AS INT) &gt; 0</property>
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT CAST(InvoiceID AS varchar(20)) AS InvoiceID, InvoiceDate, CustomerID, ProductID, TRY_CAST(QtySold AS INT) AS Quantity, SalePrice AS UnitPrice, ISNULL(DiscountMoney, 0) AS DiscountAmount FROM dbo.ERP_Sales WHERE Status = 'Completed' AND TRY_CAST(QtySold AS INT) &gt; 0</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -1953,7 +1983,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -2111,7 +2141,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -2490,7 +2520,7 @@
                   dataType="System.String"
                   description="The SQL command to be executed."
                   name="SqlCommand"
-                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT     CAST(OrderNo AS varchar(20)) AS OrderNo,     TRY_CAST(OrderDate AS date) AS OrderDate,     BuyerCode,     ItemCode,     CAST(Quantity AS INT) AS Quantity,     CAST(UnitPrice AS decimal(18,2)) AS UnitPrice,     ISNULL(ROUND((CAST(Quantity AS INT) * CAST(UnitPrice AS decimal(18,2))) * (CAST(DiscountPct AS decimal(18,2)) / 100.0), 2), 0) AS DiscountAmount FROM dbo.Stage_Online WHERE Status = 'Completed'   AND (UnitPrice IS NOT NULL AND LTRIM(RTRIM(UnitPrice)) &lt;&gt; '')   AND TRY_CAST(Quantity AS INT) &gt; 0   AND NOT EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = Stage_Online.OrderNo)</property>
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT     CAST(OrderNo AS varchar(20)) AS OrderNo,     TRY_CAST(OrderDate AS date) AS OrderDate,     BuyerCode,     ItemCode,     CAST(Quantity AS INT) AS Quantity,     CAST(UnitPrice AS decimal(18,2)) AS UnitPrice,     ISNULL(ROUND((CAST(Quantity AS INT) * CAST(UnitPrice AS decimal(18,2))) * (CAST(DiscountPct AS decimal(18,2)) / 100.0), 2), 0) AS DiscountAmount FROM dbo.Stage_Online WHERE REPLACE(LTRIM(RTRIM(Status)), CHAR(13), '') = 'Completed'   AND (UnitPrice IS NOT NULL AND LTRIM(RTRIM(UnitPrice)) &lt;&gt; '')   AND TRY_CAST(Quantity AS INT) &gt; 0   AND NOT EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = Stage_Online.OrderNo)</property>
                 <property
                   dataType="System.String"
                   description="The variable that contains the SQL command to be executed."
@@ -2960,7 +2990,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -3118,7 +3148,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -3754,7 +3784,7 @@
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
-          SQLTask:SqlStatementSource="INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ERP', InvoiceID,     CASE WHEN Status &lt;&gt; 'Completed' THEN N'Status = Cancelled'          WHEN TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 THEN N'QtySold = ''bad'' — không ép được int'          WHEN dc.CustomerKey IS NULL THEN N'CustomerID = C999 — không có trong CustomerMaster'          WHEN dp.ProductKey IS NULL THEN N'ProductID không có trong ProductMaster' END FROM RetailPlus_Legacy.dbo.ERP_Sales s LEFT JOIN dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.ProductID = dp.ProductCode WHERE Status &lt;&gt; 'Completed' OR TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 OR dc.CustomerKey IS NULL OR dp.ProductKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'POS', TransID,     CASE WHEN CustID IS NULL OR LTRIM(RTRIM(CustID)) = '' THEN N'Thiếu CustID (customer rỗng)'          WHEN TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0 THEN N'Qty = ''abc'' — không ép được số nguyên'          WHEN TRY_CONVERT(date, SaleDate, 103) IS NULL THEN N'SaleDate = 32/10/2026 — ngày không hợp lệ'          WHEN dp.ProductKey IS NULL THEN N'SKU = P999 — không có trong ProductMaster'          WHEN dc.CustomerKey IS NULL THEN N'CustID không tồn tại trong DimCustomer' END FROM dbo.Stage_POS s LEFT JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode WHERE (CustID IS NULL OR LTRIM(RTRIM(CustID)) = '')    OR (TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0)    OR TRY_CONVERT(date, SaleDate, 103) IS NULL    OR dp.ProductKey IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo,     CASE WHEN s.Status &lt;&gt; 'Completed' THEN N'Status = Cancelled'          WHEN s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '' THEN N'UnitPrice rỗng (NULL)'          WHEN TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0 THEN N'Quantity = -2 (≤ 0)'          WHEN pm.ProductCode IS NULL OR dp.ProductKey IS NULL THEN N'ItemCode = WEB-P999 — map/lookup thất bại'          WHEN cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL THEN N'BuyerCode map thất bại' END FROM dbo.Stage_Online s LEFT JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode LEFT JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode LEFT JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode LEFT JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status &lt;&gt; 'Completed'    OR (s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '')    OR (TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0)    OR pm.ProductCode IS NULL OR dp.ProductKey IS NULL    OR cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo, N'Duplicate TransactionNo' FROM dbo.Stage_Online s JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status = 'Completed'   AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; '')   AND TRY_CAST(s.Quantity AS INT) &gt; 0   AND EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo AND fs.SourceSystem &lt;&gt; 'ONLINE');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:SqlStatementSource="INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ERP', InvoiceID,     CASE WHEN Status &lt;&gt; 'Completed' THEN N'Status is not Completed'          WHEN TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 THEN N'Quantity is not a valid positive integer'          WHEN dd.DateKey IS NULL THEN N'Invoice date is invalid or outside DimDate'          WHEN dc.CustomerKey IS NULL THEN N'Customer key was not found in DimCustomer'          WHEN dp.ProductKey IS NULL THEN N'Product key was not found in DimProduct' END FROM RetailPlus_Legacy.dbo.ERP_Sales s LEFT JOIN dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.ProductID = dp.ProductCode LEFT JOIN dbo.DimDate dd ON dd.FullDate = CONVERT(date, s.InvoiceDate) WHERE Status &lt;&gt; 'Completed' OR TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 OR dc.CustomerKey IS NULL OR dp.ProductKey IS NULL OR dd.DateKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'POS', TransID,     CASE WHEN CustID IS NULL OR LTRIM(RTRIM(CustID)) = '' THEN N'Customer code is blank'          WHEN TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0 THEN N'Quantity is not a valid positive integer'          WHEN dd.DateKey IS NULL THEN N'Sale date is invalid or outside DimDate'          WHEN dp.ProductKey IS NULL THEN N'Product key was not found in DimProduct'          WHEN dc.CustomerKey IS NULL THEN N'Customer key was not found in DimCustomer' END FROM dbo.Stage_POS s LEFT JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode LEFT JOIN dbo.DimDate dd ON dd.FullDate = TRY_CONVERT(date, s.SaleDate, 103) WHERE (CustID IS NULL OR LTRIM(RTRIM(CustID)) = '')    OR (TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0)    OR dd.DateKey IS NULL    OR dp.ProductKey IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'POS', s.TransID, N'Duplicate TransactionNo; higher-priority source retained' FROM dbo.Stage_POS s LEFT JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode LEFT JOIN dbo.DimDate dd ON dd.FullDate = TRY_CONVERT(date, s.SaleDate, 103) WHERE s.CustID IS NOT NULL AND LTRIM(RTRIM(s.CustID)) &lt;&gt; '' AND TRY_CAST(s.Qty AS INT) > 0 AND TRY_CONVERT(date, s.SaleDate, 103) IS NOT NULL AND dc.CustomerKey IS NOT NULL AND dp.ProductKey IS NOT NULL AND dd.DateKey IS NOT NULL AND EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.TransID AND fs.SourceSystem &lt;&gt; 'POS'); INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo,     CASE WHEN REPLACE(LTRIM(RTRIM(s.Status)), CHAR(13), '') &lt;&gt; 'Completed' THEN N'Status is not Completed'          WHEN od.DateKey IS NULL THEN N'Order date is invalid or outside DimDate'          WHEN s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '' THEN N'Unit price is blank or NULL'          WHEN TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0 THEN N'Quantity is not a valid positive integer'          WHEN pm.ProductCode IS NULL OR dp.ProductKey IS NULL THEN N'Product mapping or dimension lookup failed'          WHEN cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL THEN N'Customer mapping or dimension lookup failed' END FROM dbo.Stage_Online s LEFT JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode LEFT JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode LEFT JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode LEFT JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode LEFT JOIN dbo.DimDate od ON od.FullDate = TRY_CAST(s.OrderDate AS date) WHERE REPLACE(LTRIM(RTRIM(s.Status)), CHAR(13), '') &lt;&gt; 'Completed'    OR (s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '')    OR (TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0)    OR pm.ProductCode IS NULL OR dp.ProductKey IS NULL    OR cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL OR od.DateKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo, N'Duplicate TransactionNo' FROM dbo.Stage_Online s JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode JOIN dbo.DimDate od ON od.FullDate = TRY_CAST(s.OrderDate AS date) WHERE REPLACE(LTRIM(RTRIM(s.Status)), CHAR(13), '') = 'Completed'   AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; '')   AND TRY_CAST(s.Quantity AS INT) &gt; 0   AND EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo AND fs.SourceSystem &lt;&gt; 'ONLINE');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
@@ -3769,7 +3799,22 @@
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
           SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
-          SQLTask:SqlStatementSource="BULK INSERT dbo.Stage_POS FROM 'D:\BI_TA2\POS.csv' WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0d0a', FORMAT = 'CSV', FIELDQUOTE = '&quot;'); INSERT INTO dbo.Stage_Online (OrderNo, OrderDate, BuyerCode, ItemCode, Quantity, UnitPrice, DiscountPct, Status) VALUES ('T011', '2026-10-12', 'WEB-C001', 'WEB-P003', '3', '75000', '0', 'Completed'), ('T012', '2026-10-13', 'WEB-C002', 'WEB-P004', '1', '150000', '10', 'Completed'), ('T013', '2026-10-14', 'WEB-C003', 'WEB-P001', '2', NULL, '0', 'Completed'), ('T014', '2026-10-15', 'WEB-C004', 'WEB-P002', '3', '200000', '0', 'Completed'), ('T015', '2026-10-16', 'WEB-C005', 'WEB-P003', '1', '75000', '0', 'Completed'), ('T016', '2026-10-17', 'WEB-C001', 'WEB-P004', '2', '150000', '10', 'Completed'), ('T017', '2026-10-18', 'WEB-C002', 'WEB-P001', '3', '100000', '0', 'Completed'), ('T018', '2026-10-19', 'WEB-C003', 'WEB-P002', '-2', '200000', '0', 'Completed'), ('T019', '2026-10-20', 'WEB-C004', 'WEB-P003', '2', '75000', '0', 'Completed'), ('T020', '2026-10-01', 'WEB-C005', 'WEB-P004', '3', '150000', '10', 'Completed'), ('T021', '2026-10-02', 'WEB-C001', 'WEB-P001', '1', '100000', '0', 'Cancelled'), ('T022', '2026-10-03', 'WEB-C002', 'WEB-P002', '2', '200000', '0', 'Completed'), ('T023', '2026-10-04', 'WEB-C003', 'WEB-P003', '3', '75000', '0', 'Completed'), ('T024', '2026-10-05', 'WEB-C004', 'WEB-P999', '1', '150000', '10', 'Completed'), ('T025', '2026-10-06', 'WEB-C005', 'WEB-P001', '2', '100000', '0', 'Completed'), ('T026', '2026-10-07', 'WEB-C001', 'WEB-P002', '3', '200000', '0', 'Completed');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+          SQLTask:SqlStatementSource="DECLARE @PosPath nvarchar(4000);
+DECLARE @OnlinePath nvarchar(4000);
+SELECT @PosPath = FilePath FROM dbo.ETL_FileConfig WHERE SourceSystem = 'POS';
+SELECT @OnlinePath = FilePath FROM dbo.ETL_FileConfig WHERE SourceSystem = 'ONLINE';
+IF NULLIF(LTRIM(RTRIM(@PosPath)), N'') IS NULL OR NULLIF(LTRIM(RTRIM(@OnlinePath)), N'') IS NULL
+    THROW 51002, 'Configure both CSV paths in dbo.ETL_FileConfig before staging.', 1;
+
+DECLARE @Quote nchar(1) = NCHAR(39);
+DECLARE @BulkOptions nvarchar(500) = N' WITH (FIRSTROW = 2, ROWTERMINATOR = ''0x0a'', FORMAT = ''CSV'', FIELDQUOTE = ''&quot;'', CODEPAGE = ''65001'');';
+DECLARE @BulkSql nvarchar(max);
+
+SET @BulkSql = N'BULK INSERT dbo.Stage_POS FROM ' + @Quote + REPLACE(@PosPath, @Quote, @Quote + @Quote) + @Quote + @BulkOptions;
+EXEC sys.sp_executesql @BulkSql;
+
+SET @BulkSql = N'BULK INSERT dbo.Stage_Online FROM ' + @Quote + REPLACE(@OnlinePath, @Quote, @Quote + @Quote) + @Quote + @BulkOptions;
+EXEC sys.sp_executesql @BulkSql;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
   </DTS:Executables>
