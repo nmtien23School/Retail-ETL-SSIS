@@ -1,41 +1,34 @@
 ==============================================================
   GHI CHÚ SỬ DỤNG CÔNG CỤ AI – AI USAGE DECLARATION
   Dự án: Retail ETL SSIS – BI Assignment
-  Sinh viên: nmtien23School
+  Sinh viên:23127495 - Nguyễn Minh Tiến
+            23127182 - Nguyễn Trường Duy
+            22127107 - Nguyễn Thế Hiển
   Ngày: 20/11/2026
 ==============================================================
 
 1. CÔNG CỤ AI ĐÃ SỬ DỤNG
 --------------------------
   - Công cụ  : Google Antigravity (Powered by Gemini / Claude Sonnet)
-  - Mục đích : Hỗ trợ tra cứu, giải thích khái niệm và gợi ý hướng
-               xử lý khi gặp vấn đề trong quá trình làm bài
+  - Mục đích : Hỗ trợ tra cứu, giải thích khái niệm và gợi ý hướng xử lý khi gặp vấn đề trong quá trình làm bài
 
 2. CÁCH SỬ DỤNG
 --------------------------
   - Hỏi về cách thiết kế Control Flow và Data Flow trong SSIS
-  - Hỏi về sự khác biệt giữa các component: Derived Column, Lookup,
-    OLE DB Source/Destination và khi nào nên dùng
+  - Hỏi về sự khác biệt giữa các component: Derived Column, Lookup, OLE DB Source/Destination và khi nào nên dùng
   - Tra cứu cú pháp SSIS Expression (YEAR(), MONTH(), DAY(), DT_NUMERIC...)
-  - Hỏi cách xử lý lỗi "Row yielded no match during lookup" và
-    ý nghĩa của thuộc tính NoMatchBehavior trong Lookup component
-  - Hỏi cách phát hiện và xử lý duplicate TransactionNo theo
-    thứ tự ưu tiên nguồn dữ liệu (ERP > POS > ONLINE)
-  - Tra cứu SQL xử lý encoding CRLF khi BULK INSERT file CSV
+  - Hỏi cách xử lý lỗi "Row yielded no match during lookup" và ý nghĩa của thuộc tính NoMatchBehavior trong Lookup component
+  - Hỏi cách phát hiện và xử lý duplicate TransactionNo theo thứ tự ưu tiên nguồn dữ liệu (ERP > POS > ONLINE)
+  - Giúp đở phần debug những vấn đề đã gặp trong quá trình làm bài tập
 
 3. NHỮNG GÌ SINH VIÊN TỰ THỰC HIỆN
 --------------------------------------
   - Phân tích yêu cầu đề bài và xác định nguồn dữ liệu (POS, Online, ERP)
-  - Thiết kế schema Data Warehouse:
-      DimDate, DimCustomer, DimProduct, FactSales, ETL_RejectedRows
   - Xây dựng Control Flow với 9 task và Precedence Constraint
-  - Thiết kế Data Flow cho từng task Fact với các component:
-      OLE DB Source → Derived Column → Lookup DimCustomer
-      → Lookup DimProduct → OLE DB Destination
+  - Thiết kế Data Flow cho từng task Fact với các component: OLE DB Source → Derived Column → Lookup DimCustomer → Lookup DimProduct → OLE DB Destination
   - Viết SQL ETL logic cho từng bước
   - Chuẩn bị và nạp dữ liệu nguồn: POS.csv, Online, RetailPlus_Legacy
   - Debug lỗi, kiểm tra kết quả và xác nhận tính đúng đắn
-  - Quản lý source code trên GitHub
 
 4. KẾT QUẢ CUỐI CÙNG (đã kiểm tra)
 --------------------------------------
@@ -46,5 +39,4 @@
   - ETL_RejectedRows : 19 rows  (lỗi format + duplicate)
   - Tổng doanh thu thực thu (NetAmount): 7,945,000 VND
   - 0 Warning, 0 Error trong Visual Studio
-
 ==============================================================
