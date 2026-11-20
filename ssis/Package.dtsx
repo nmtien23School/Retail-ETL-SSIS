@@ -1,207 +1,2494 @@
 <?xml version="1.0"?>
 <DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
   DTS:refId="Package"
-  DTS:CreationDate="11/20/2026 8:07:41 AM"
+  DTS:CreationDate="11/20/2026 8:54:41 AM"
   DTS:CreationName="Microsoft.Package"
   DTS:CreatorComputerName="LAPTOP-7IRDHAGI"
   DTS:CreatorName="LAPTOP-7IRDHAGI\ASUS"
-  DTS:DTSID="{4BC38CF1-7CA8-44D2-A8E9-B054C8216127}"
+  DTS:DTSID="{D5634E91-DC8F-4003-BD83-257B8F60D494}"
   DTS:ExecutableType="Microsoft.Package"
-  DTS:LastModifiedProductVersion="17.0.1016.0"
+  DTS:LastModifiedProductVersion="16.0.1000.6"
   DTS:LocaleID="1033"
-  DTS:ObjectName="Package"
-  DTS:PackageType="5"
-  DTS:VersionGUID="{BC577A58-7A5A-4C2F-B4B6-FAA0F35105C8}">
-  <DTS:Property DTS:Name="PackageFormatVersion">8</DTS:Property>
+  DTS:ObjectName="Retail_ETL_Package"
+  DTS:VersionGUID="{CF3D4D32-9691-42C4-B20D-6DFA0AD3EBF1}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
-    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[DDS_DB]" DTS:CreationName="OLEDB" DTS:DTSID="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" DTS:ObjectName="DDS_DB">
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DDS_DST]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{00C3652B-B038-4A90-9F9D-370FC671E5CC}"
+      DTS:ObjectName="DDS_DST">
       <DTS:ObjectData>
-        <DTS:ConnectionManager DTS:ConnectRetryCount="1" DTS:ConnectRetryInterval="5" DTS:ConnectionString="Data Source=.\SQLEXPRESS;Initial Catalog=Retail_DDS;Provider=MSOLEDBSQL.1;Integrated Security=SSPI;Auto Translate=False;" />
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=.\SQLEXPRESS;Initial Catalog=Retail_DDS;Provider=MSOLEDBSQL.1;Integrated Security=SSPI;Auto Translate=False;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
-    <DTS:ConnectionManager DTS:refId="Package.ConnectionManagers[ERP_DB]" DTS:CreationName="OLEDB" DTS:DTSID="{DB0A4E0D-E739-4FAD-A92A-EB0D6376E7B1}" DTS:ObjectName="ERP_DB">
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[ERP_SRC]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{E8ACE55F-F3C4-4DD2-A23F-1E2CE0FD5EAC}"
+      DTS:ObjectName="ERP_SRC">
       <DTS:ObjectData>
-        <DTS:ConnectionManager DTS:ConnectRetryCount="1" DTS:ConnectRetryInterval="5" DTS:ConnectionString="Data Source=.\SQLEXPRESS;Initial Catalog=RetailPlus_Legacy;Provider=MSOLEDBSQL.1;Integrated Security=SSPI;Auto Translate=False;" />
+        <DTS:ConnectionManager
+          DTS:ConnectRetryCount="1"
+          DTS:ConnectRetryInterval="5"
+          DTS:ConnectionString="Data Source=.\SQLEXPRESS;Initial Catalog=RetailPlus_Legacy;Provider=MSOLEDBSQL.1;Integrated Security=SSPI;Auto Translate=False;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
   </DTS:ConnectionManagers>
   <DTS:Variables />
   <DTS:Executables>
-    <DTS:Executable DTS:refId="Package\01 - Setup and Clear DDS" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Truncate staging, fact, and rejected tables and ensure stage structure" DTS:DTSID="{886A9358-C538-481C-803E-DF124483353C}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="01 - Setup and Clear DDS" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Clear DDS"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{E26DEA48-BB46-4B33-B42E-0CD3885A4740}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Clear DDS"
+      DTS:ThreadHint="0">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;IF OBJECT_ID(&apos;dbo.Stage_POS&apos;, &apos;U&apos;) IS NULL CREATE TABLE dbo.Stage_POS (TransID varchar(50), SaleDate varchar(50), CustID varchar(50), SKU varchar(50), Qty varchar(50), Price varchar(50), DiscountVND varchar(50));&#xA;IF OBJECT_ID(&apos;dbo.Stage_Online&apos;, &apos;U&apos;) IS NULL CREATE TABLE dbo.Stage_Online (OrderNo varchar(50), OrderDate varchar(50), BuyerCode varchar(50), ItemCode varchar(50), Quantity varchar(50), UnitPrice varchar(50), DiscountPct varchar(50), Status varchar(50));&#xA;IF OBJECT_ID(&apos;dbo.Stage_ERP&apos;, &apos;U&apos;) IS NULL CREATE TABLE dbo.Stage_ERP (InvoiceID varchar(50), InvoiceDate datetime2, CustomerID varchar(50), ProductID varchar(50), QtySold varchar(50), SalePrice decimal(18,2), DiscountMoney decimal(18,2), Status varchar(50));&#xA;TRUNCATE TABLE dbo.Stage_POS;&#xA;TRUNCATE TABLE dbo.Stage_Online;&#xA;TRUNCATE TABLE dbo.Stage_ERP;&#xA;DELETE FROM dbo.FactSales;&#xA;DELETE FROM dbo.ETL_RejectedRows;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{00C3652B-B038-4A90-9F9D-370FC671E5CC}"
+          SQLTask:SqlStatementSource="DELETE FROM dbo.FactSales; DELETE FROM dbo.ETL_RejectedRows; DELETE FROM dbo.DimProduct; DELETE FROM dbo.DimCustomer; DELETE FROM dbo.DimDate; IF OBJECT_ID('dbo.Stage_POS', 'U') IS NULL CREATE TABLE dbo.Stage_POS (TransID varchar(50), SaleDate varchar(50), CustID varchar(50), SKU varchar(50), Qty varchar(50), Price varchar(50), DiscountVND varchar(50)); IF OBJECT_ID('dbo.Stage_Online', 'U') IS NULL CREATE TABLE dbo.Stage_Online (OrderNo varchar(50), OrderDate varchar(50), BuyerCode varchar(50), ItemCode varchar(50), Quantity varchar(50), UnitPrice varchar(50), DiscountPct varchar(50), Status varchar(50)); IF OBJECT_ID('dbo.Stage_ERP', 'U') IS NULL CREATE TABLE dbo.Stage_ERP (InvoiceID varchar(50), InvoiceDate datetime2, CustomerID varchar(50), ProductID varchar(50), QtySold varchar(50), SalePrice decimal(18,2), DiscountMoney decimal(18,2), Status varchar(50)); TRUNCATE TABLE dbo.Stage_POS; TRUNCATE TABLE dbo.Stage_Online; TRUNCATE TABLE dbo.Stage_ERP;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\02 - Load DimDate" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Generate dates for October 2026" DTS:DTSID="{7239A521-70B6-4861-AD63-78180DAD9ECC}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="02 - Load DimDate" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load DimCustomer"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{9FA8EEF9-4E38-45CE-B75B-B43440A0F795}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimCustomer"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;DECLARE @d date = &apos;2026-10-01&apos;;&#xA;WHILE @d &lt;= &apos;2026-10-31&apos;&#xA;BEGIN&#xA;    IF NOT EXISTS (SELECT 1 FROM dbo.DimDate WHERE FullDate = @d)&#xA;    BEGIN&#xA;        INSERT INTO dbo.DimDate (DateKey, FullDate, [Month], [Quarter], [Year])&#xA;        VALUES (YEAR(@d)*10000 + MONTH(@d)*100 + DAY(@d), @d, MONTH(@d), DATEPART(QUARTER, @d), YEAR(@d));&#xA;    END;&#xA;    SET @d = DATEADD(DAY, 1, @d);&#xA;END;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load DimCustomer\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[DimCustomer]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load DimCustomer\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[CustomerCode]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="10"
+                      cachedName="CustomerCode"
+                      externalMetadataColumnId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerCode]"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerCode]" />
+                    <inputColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[CustomerName]"
+                      cachedDataType="wstr"
+                      cachedLength="100"
+                      cachedName="CustomerName"
+                      externalMetadataColumnId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerName]"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerName]" />
+                    <inputColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[City]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="City"
+                      externalMetadataColumnId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[City]"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[City]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerCode]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="CustomerCode" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerName]"
+                      dataType="wstr"
+                      length="100"
+                      name="CustomerName" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[City]"
+                      dataType="wstr"
+                      length="50"
+                      name="City" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load DimCustomer\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load DimCustomer\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load DimCustomer\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load DimCustomer\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT CustomerCode, CustomerName, City FROM dbo.CustomerMaster</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load DimCustomer\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[ERP_SRC]"
+                  connectionManagerRefId="Package.ConnectionManagers[ERP_SRC]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerCode]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerCode]"
+                      length="10"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerCode]"
+                      name="CustomerCode"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerName]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerName]"
+                      length="100"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerName]"
+                      name="CustomerName"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[City]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[City]"
+                      length="50"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].Columns[City]"
+                      name="City"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerCode]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="CustomerCode" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerName]"
+                      dataType="wstr"
+                      length="100"
+                      name="CustomerName" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[City]"
+                      dataType="wstr"
+                      length="50"
+                      name="City" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerCode]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerCode]"
+                      name="CustomerCode" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerName]"
+                      dataType="wstr"
+                      length="100"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerName]"
+                      name="CustomerName" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[City]"
+                      dataType="wstr"
+                      length="50"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[City]"
+                      name="City" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load DimCustomer.Paths[OLE DB Source Output]"
+              endId="Package\Load DimCustomer\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load DimCustomer\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\03 - Load DimCustomer" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Load master customers from RetailPlus_Legacy" DTS:DTSID="{20647C11-F809-453D-923A-6E762ECB2C82}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="03 - Load DimCustomer" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load DimDate"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{D549B363-9CB8-4C9F-A551-27D249460318}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimDate"
+      DTS:ThreadHint="0">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;INSERT INTO dbo.DimCustomer (CustomerCode, CustomerName, City)&#xA;SELECT cm.CustomerCode, cm.CustomerName, cm.City&#xA;FROM RetailPlus_Legacy.dbo.CustomerMaster cm&#xA;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimCustomer dc WHERE dc.CustomerCode = cm.CustomerCode);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{00C3652B-B038-4A90-9F9D-370FC671E5CC}"
+          SQLTask:SqlStatementSource="DECLARE @d date = '2026-10-01'; WHILE @d &lt;= '2026-10-31' BEGIN INSERT INTO dbo.DimDate (DateKey, FullDate, [Month], [Quarter], [Year]) VALUES (YEAR(@d)*10000 + MONTH(@d)*100 + DAY(@d), @d, MONTH(@d), DATEPART(QUARTER, @d), YEAR(@d)); SET @d = DATEADD(DAY, 1, @d); END;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\04 - Load DimProduct" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Load master products from RetailPlus_Legacy" DTS:DTSID="{9B9E621D-3EDF-4D9A-BAFE-5442EEDD548E}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="04 - Load DimProduct" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load DimProduct"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{0EB6374E-5E40-4469-8AA4-8959353FDFF2}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load DimProduct"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;INSERT INTO dbo.DimProduct (ProductCode, ProductName, Category)&#xA;SELECT pm.ProductCode, pm.ProductName, pm.Category&#xA;FROM RetailPlus_Legacy.dbo.ProductMaster pm&#xA;WHERE NOT EXISTS (SELECT 1 FROM dbo.DimProduct dp WHERE dp.ProductCode = pm.ProductCode);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load DimProduct\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[DimProduct]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load DimProduct\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ProductCode]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="10"
+                      cachedName="ProductCode"
+                      externalMetadataColumnId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductCode]"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductCode]" />
+                    <inputColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ProductName]"
+                      cachedDataType="wstr"
+                      cachedLength="100"
+                      cachedName="ProductName"
+                      externalMetadataColumnId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductName]"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductName]" />
+                    <inputColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Category]"
+                      cachedDataType="wstr"
+                      cachedLength="50"
+                      cachedName="Category"
+                      externalMetadataColumnId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Category]"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[Category]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductCode]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="ProductCode" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductName]"
+                      dataType="wstr"
+                      length="100"
+                      name="ProductName" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Category]"
+                      dataType="wstr"
+                      length="50"
+                      name="Category" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load DimProduct\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load DimProduct\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load DimProduct\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load DimProduct\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT ProductCode, ProductName, Category FROM dbo.ProductMaster</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load DimProduct\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[ERP_SRC]"
+                  connectionManagerRefId="Package.ConnectionManagers[ERP_SRC]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductCode]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductCode]"
+                      length="10"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductCode]"
+                      name="ProductCode"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductName]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductName]"
+                      length="100"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductName]"
+                      name="ProductName"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[Category]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Category]"
+                      length="50"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].Columns[Category]"
+                      name="Category"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductCode]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="ProductCode" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductName]"
+                      dataType="wstr"
+                      length="100"
+                      name="ProductName" />
+                    <externalMetadataColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Category]"
+                      dataType="wstr"
+                      length="50"
+                      name="Category" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductCode]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductCode]"
+                      name="ProductCode" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductName]"
+                      dataType="wstr"
+                      length="100"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductName]"
+                      name="ProductName" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Category]"
+                      dataType="wstr"
+                      length="50"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Category]"
+                      name="Category" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load DimProduct.Paths[OLE DB Source Output]"
+              endId="Package\Load DimProduct\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load DimProduct\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\05 - Extract POS to Stage" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Extract POS.csv into Stage_POS" DTS:DTSID="{0152899C-BB5E-4086-8DA2-6ED683F19250}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="05 - Extract POS to Stage" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load Fact ERP"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{DA3EACA5-14D3-47DC-8FF1-C2D2C2D09C85}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Fact ERP"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;TRUNCATE TABLE dbo.Stage_POS;&#xA;BULK INSERT dbo.Stage_POS&#xA;FROM &apos;D:\BI_TA2\POS.csv&apos;&#xA;WITH (&#xA;    FIRSTROW = 2,&#xA;    FIELDTERMINATOR = &apos;,&apos;,&#xA;    ROWTERMINATOR = &apos;0x0d0a&apos;,&#xA;    FORMAT = &apos;CSV&apos;,&#xA;    FIELDQUOTE = &apos;&quot;&apos;&#xA;);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load Fact ERP\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[FactSales]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Fact ERP\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[TransactionNo]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="20"
+                      cachedName="TransactionNo"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[TransactionNo]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DateKey]"
+                      cachedDataType="i4"
+                      cachedName="DateKey"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DateKey]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[CustomerKey]"
+                      cachedDataType="i4"
+                      cachedName="CustomerKey"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ProductKey]"
+                      cachedDataType="i4"
+                      cachedName="ProductKey"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[SourceSystem]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="3"
+                      cachedName="SourceSystem"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystem]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Quantity]"
+                      cachedDataType="i4"
+                      cachedName="Quantity"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[UnitPrice]"
+                      cachedDataType="numeric"
+                      cachedName="UnitPrice"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[UnitPrice]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[GrossAmount]"
+                      cachedDataType="numeric"
+                      cachedName="GrossAmount"
+                      cachedPrecision="29"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[GrossAmount]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DiscountAmount]"
+                      cachedDataType="numeric"
+                      cachedName="DiscountAmount"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DiscountAmount]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]" />
+                    <inputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[NetAmount]"
+                      cachedDataType="numeric"
+                      cachedName="NetAmount"
+                      cachedPrecision="30"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NetAmount]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SalesKey]"
+                      dataType="i8"
+                      name="SalesKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="20"
+                      name="TransactionNo" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DateKey]"
+                      dataType="i4"
+                      name="DateKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="SourceSystem" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      dataType="i4"
+                      name="Quantity" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[UnitPrice]"
+                      dataType="numeric"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[GrossAmount]"
+                      dataType="numeric"
+                      name="GrossAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DiscountAmount]"
+                      dataType="numeric"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NetAmount]"
+                      dataType="numeric"
+                      name="NetAmount"
+                      precision="18"
+                      scale="2" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load Fact ERP\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load Fact ERP\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT     s.InvoiceID AS TransactionNo,     YEAR(s.InvoiceDate)*10000 + MONTH(s.InvoiceDate)*100 + DAY(s.InvoiceDate) AS DateKey,     dc.CustomerKey,     dp.ProductKey,     'ERP' AS SourceSystem,     CAST(s.QtySold AS INT) AS Quantity,     s.SalePrice AS UnitPrice,     CAST(s.QtySold AS INT) * s.SalePrice AS GrossAmount,     ISNULL(s.DiscountMoney, 0) AS DiscountAmount,     (CAST(s.QtySold AS INT) * s.SalePrice) - ISNULL(s.DiscountMoney, 0) AS NetAmount FROM RetailPlus_Legacy.dbo.ERP_Sales s JOIN Retail_DDS.dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode JOIN Retail_DDS.dbo.DimProduct dp ON s.ProductID = dp.ProductCode WHERE s.Status = 'Completed' AND TRY_CAST(s.QtySold AS INT) &gt; 0</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Fact ERP\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[TransactionNo]"
+                      length="20"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]"
+                      name="TransactionNo"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DateKey]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]"
+                      name="DateKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerKey]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]"
+                      name="CustomerKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductKey]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]"
+                      name="ProductKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[SourceSystem]"
+                      length="3"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]"
+                      name="SourceSystem"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Quantity]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]"
+                      name="Quantity"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[UnitPrice]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[GrossAmount]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DiscountAmount]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NetAmount]"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]"
+                      name="NetAmount"
+                      precision="30"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="20"
+                      name="TransactionNo" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DateKey]"
+                      dataType="i4"
+                      name="DateKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="3"
+                      name="SourceSystem" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Quantity]"
+                      dataType="i4"
+                      name="Quantity" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[UnitPrice]"
+                      dataType="numeric"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[GrossAmount]"
+                      dataType="numeric"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DiscountAmount]"
+                      dataType="numeric"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NetAmount]"
+                      dataType="numeric"
+                      name="NetAmount"
+                      precision="30"
+                      scale="2" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="20"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[TransactionNo]"
+                      name="TransactionNo" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DateKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DateKey]"
+                      name="DateKey" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerKey]"
+                      name="CustomerKey" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductKey]"
+                      name="ProductKey" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="3"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[SourceSystem]"
+                      name="SourceSystem" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Quantity]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Quantity]"
+                      name="Quantity" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[UnitPrice]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[UnitPrice]"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[GrossAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[GrossAmount]"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DiscountAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DiscountAmount]"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NetAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NetAmount]"
+                      name="NetAmount"
+                      precision="30"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load Fact ERP.Paths[OLE DB Source Output]"
+              endId="Package\Load Fact ERP\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load Fact ERP\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\06 - Extract Online to Stage" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Extract Online orders into Stage_Online" DTS:DTSID="{702612F4-F9A3-433C-8F7B-1D8FBFB05EF2}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="06 - Extract Online to Stage" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load Fact Online"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{5B417424-B108-4DC5-A464-B39C3F621197}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Fact Online"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;TRUNCATE TABLE dbo.Stage_Online;&#xA;INSERT INTO dbo.Stage_Online (OrderNo, OrderDate, BuyerCode, ItemCode, Quantity, UnitPrice, DiscountPct, Status) VALUES&#xA;(&apos;T011&apos;, &apos;2026-10-12&apos;, &apos;WEB-C001&apos;, &apos;WEB-P003&apos;, &apos;3&apos;, &apos;75000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T012&apos;, &apos;2026-10-13&apos;, &apos;WEB-C002&apos;, &apos;WEB-P004&apos;, &apos;1&apos;, &apos;150000&apos;, &apos;10&apos;, &apos;Completed&apos;),&#xA;(&apos;T013&apos;, &apos;2026-10-14&apos;, &apos;WEB-C003&apos;, &apos;WEB-P001&apos;, &apos;2&apos;, NULL, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T014&apos;, &apos;2026-10-15&apos;, &apos;WEB-C004&apos;, &apos;WEB-P002&apos;, &apos;3&apos;, &apos;200000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T015&apos;, &apos;2026-10-16&apos;, &apos;WEB-C005&apos;, &apos;WEB-P003&apos;, &apos;1&apos;, &apos;75000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T016&apos;, &apos;2026-10-17&apos;, &apos;WEB-C001&apos;, &apos;WEB-P004&apos;, &apos;2&apos;, &apos;150000&apos;, &apos;10&apos;, &apos;Completed&apos;),&#xA;(&apos;T017&apos;, &apos;2026-10-18&apos;, &apos;WEB-C002&apos;, &apos;WEB-P001&apos;, &apos;3&apos;, &apos;100000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T018&apos;, &apos;2026-10-19&apos;, &apos;WEB-C003&apos;, &apos;WEB-P002&apos;, &apos;-2&apos;, &apos;200000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T019&apos;, &apos;2026-10-20&apos;, &apos;WEB-C004&apos;, &apos;WEB-P003&apos;, &apos;2&apos;, &apos;75000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T020&apos;, &apos;2026-10-01&apos;, &apos;WEB-C005&apos;, &apos;WEB-P004&apos;, &apos;3&apos;, &apos;150000&apos;, &apos;10&apos;, &apos;Completed&apos;),&#xA;(&apos;T021&apos;, &apos;2026-10-02&apos;, &apos;WEB-C001&apos;, &apos;WEB-P001&apos;, &apos;1&apos;, &apos;100000&apos;, &apos;0&apos;, &apos;Cancelled&apos;),&#xA;(&apos;T022&apos;, &apos;2026-10-03&apos;, &apos;WEB-C002&apos;, &apos;WEB-P002&apos;, &apos;2&apos;, &apos;200000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T023&apos;, &apos;2026-10-04&apos;, &apos;WEB-C003&apos;, &apos;WEB-P003&apos;, &apos;3&apos;, &apos;75000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T024&apos;, &apos;2026-10-05&apos;, &apos;WEB-C004&apos;, &apos;WEB-P999&apos;, &apos;1&apos;, &apos;150000&apos;, &apos;10&apos;, &apos;Completed&apos;),&#xA;(&apos;T025&apos;, &apos;2026-10-06&apos;, &apos;WEB-C005&apos;, &apos;WEB-P001&apos;, &apos;2&apos;, &apos;100000&apos;, &apos;0&apos;, &apos;Completed&apos;),&#xA;(&apos;T026&apos;, &apos;2026-10-07&apos;, &apos;WEB-C001&apos;, &apos;WEB-P002&apos;, &apos;3&apos;, &apos;200000&apos;, &apos;0&apos;, &apos;Completed&apos;);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load Fact Online\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[FactSales]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Fact Online\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[TransactionNo]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="TransactionNo"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[TransactionNo]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DateKey]"
+                      cachedDataType="i4"
+                      cachedName="DateKey"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DateKey]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[CustomerKey]"
+                      cachedDataType="i4"
+                      cachedName="CustomerKey"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ProductKey]"
+                      cachedDataType="i4"
+                      cachedName="ProductKey"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[SourceSystem]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="6"
+                      cachedName="SourceSystem"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystem]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Quantity]"
+                      cachedDataType="i4"
+                      cachedName="Quantity"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[UnitPrice]"
+                      cachedDataType="numeric"
+                      cachedName="UnitPrice"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[UnitPrice]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[GrossAmount]"
+                      cachedDataType="numeric"
+                      cachedName="GrossAmount"
+                      cachedPrecision="29"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[GrossAmount]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DiscountAmount]"
+                      cachedDataType="numeric"
+                      cachedName="DiscountAmount"
+                      cachedPrecision="38"
+                      cachedScale="6"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DiscountAmount]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]" />
+                    <inputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[NetAmount]"
+                      cachedDataType="numeric"
+                      cachedName="NetAmount"
+                      cachedPrecision="38"
+                      cachedScale="6"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NetAmount]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SalesKey]"
+                      dataType="i8"
+                      name="SalesKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="20"
+                      name="TransactionNo" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DateKey]"
+                      dataType="i4"
+                      name="DateKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="SourceSystem" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      dataType="i4"
+                      name="Quantity" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[UnitPrice]"
+                      dataType="numeric"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[GrossAmount]"
+                      dataType="numeric"
+                      name="GrossAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DiscountAmount]"
+                      dataType="numeric"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NetAmount]"
+                      dataType="numeric"
+                      name="NetAmount"
+                      precision="18"
+                      scale="2" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load Fact Online\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load Fact Online\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT     s.OrderNo AS TransactionNo,     CONVERT(int, FORMAT(TRY_CAST(s.OrderDate AS date), 'yyyyMMdd')) AS DateKey,     dc.CustomerKey,     dp.ProductKey,     'ONLINE' AS SourceSystem,     CAST(s.Quantity AS INT) AS Quantity,     CAST(s.UnitPrice AS decimal(18,2)) AS UnitPrice,     CAST(s.Quantity AS INT) * CAST(s.UnitPrice AS decimal(18,2)) AS GrossAmount,     ISNULL(ROUND((CAST(s.Quantity AS INT) * CAST(s.UnitPrice AS decimal(18,2))) * (CAST(s.DiscountPct AS decimal(18,2)) / 100.0), 2), 0) AS DiscountAmount,     (CAST(s.Quantity AS INT) * CAST(s.UnitPrice AS decimal(18,2))) - ISNULL(ROUND((CAST(s.Quantity AS INT) * CAST(s.UnitPrice AS decimal(18,2))) * (CAST(s.DiscountPct AS decimal(18,2)) / 100.0), 2), 0) AS NetAmount FROM Retail_DDS.dbo.Stage_Online s JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode JOIN Retail_DDS.dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode JOIN Retail_DDS.dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status = 'Completed'   AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; '')   AND TRY_CAST(s.Quantity AS INT) &gt; 0   AND NOT EXISTS (SELECT 1 FROM Retail_DDS.dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo)</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Fact Online\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[TransactionNo]"
+                      length="50"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]"
+                      name="TransactionNo"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DateKey]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]"
+                      name="DateKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerKey]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]"
+                      name="CustomerKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductKey]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]"
+                      name="ProductKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[SourceSystem]"
+                      length="6"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]"
+                      name="SourceSystem"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Quantity]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]"
+                      name="Quantity"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[UnitPrice]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[GrossAmount]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DiscountAmount]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]"
+                      name="DiscountAmount"
+                      precision="38"
+                      scale="6"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NetAmount]"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]"
+                      name="NetAmount"
+                      precision="38"
+                      scale="6"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="50"
+                      name="TransactionNo" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DateKey]"
+                      dataType="i4"
+                      name="DateKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="6"
+                      name="SourceSystem" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Quantity]"
+                      dataType="i4"
+                      name="Quantity" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[UnitPrice]"
+                      dataType="numeric"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[GrossAmount]"
+                      dataType="numeric"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DiscountAmount]"
+                      dataType="numeric"
+                      name="DiscountAmount"
+                      precision="38"
+                      scale="6" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NetAmount]"
+                      dataType="numeric"
+                      name="NetAmount"
+                      precision="38"
+                      scale="6" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[TransactionNo]"
+                      name="TransactionNo" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DateKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DateKey]"
+                      name="DateKey" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerKey]"
+                      name="CustomerKey" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductKey]"
+                      name="ProductKey" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="6"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[SourceSystem]"
+                      name="SourceSystem" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Quantity]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Quantity]"
+                      name="Quantity" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[UnitPrice]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[UnitPrice]"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[GrossAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[GrossAmount]"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DiscountAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DiscountAmount]"
+                      name="DiscountAmount"
+                      precision="38"
+                      scale="6" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NetAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NetAmount]"
+                      name="NetAmount"
+                      precision="38"
+                      scale="6" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load Fact Online.Paths[OLE DB Source Output]"
+              endId="Package\Load Fact Online\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load Fact Online\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\07 - Extract ERP to Stage" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Extract ERP_Sales into Stage_ERP" DTS:DTSID="{2408BBEF-798F-4820-BF68-8DD50068EFBF}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="07 - Extract ERP to Stage" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load Fact POS"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{80191DF1-D56E-4720-BB85-27E48ECF3C1A}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Fact POS"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;TRUNCATE TABLE dbo.Stage_ERP;&#xA;INSERT INTO dbo.Stage_ERP&#xA;SELECT InvoiceID, InvoiceDate, CustomerID, ProductID, QtySold, SalePrice, DiscountMoney, Status&#xA;FROM RetailPlus_Legacy.dbo.ERP_Sales;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <pipeline
+          version="1">
+          <components>
+            <component
+              refId="Package\Load Fact POS\OLE DB Destination"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="OLE DB Destination"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[FactSales]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Fact POS\OLE DB Destination.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="OLE DB Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[TransactionNo]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="50"
+                      cachedName="TransactionNo"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[TransactionNo]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DateKey]"
+                      cachedDataType="i4"
+                      cachedName="DateKey"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DateKey]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[CustomerKey]"
+                      cachedDataType="i4"
+                      cachedName="CustomerKey"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[ProductKey]"
+                      cachedDataType="i4"
+                      cachedName="ProductKey"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[SourceSystem]"
+                      cachedCodepage="1258"
+                      cachedDataType="str"
+                      cachedLength="3"
+                      cachedName="SourceSystem"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystem]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[Quantity]"
+                      cachedDataType="i4"
+                      cachedName="Quantity"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[UnitPrice]"
+                      cachedDataType="numeric"
+                      cachedName="UnitPrice"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[UnitPrice]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[GrossAmount]"
+                      cachedDataType="numeric"
+                      cachedName="GrossAmount"
+                      cachedPrecision="29"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[GrossAmount]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[DiscountAmount]"
+                      cachedDataType="numeric"
+                      cachedName="DiscountAmount"
+                      cachedPrecision="18"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DiscountAmount]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]" />
+                    <inputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].Columns[NetAmount]"
+                      cachedDataType="numeric"
+                      cachedName="NetAmount"
+                      cachedPrecision="30"
+                      cachedScale="2"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NetAmount]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SalesKey]"
+                      dataType="i8"
+                      name="SalesKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="20"
+                      name="TransactionNo" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DateKey]"
+                      dataType="i4"
+                      name="DateKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="10"
+                      name="SourceSystem" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[Quantity]"
+                      dataType="i4"
+                      name="Quantity" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[UnitPrice]"
+                      dataType="numeric"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[GrossAmount]"
+                      dataType="numeric"
+                      name="GrossAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[DiscountAmount]"
+                      dataType="numeric"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input].ExternalColumns[NetAmount]"
+                      dataType="numeric"
+                      name="NetAmount"
+                      precision="18"
+                      scale="2" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Load Fact POS\OLE DB Destination.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Destination.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Load Fact POS\OLE DB Source"
+              componentClassID="Microsoft.OLEDBSource"
+              contactInfo="OLE DB Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;7"
+              description="OLE DB Source"
+              name="OLE DB Source"
+              usesDispositions="true"
+              version="7">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset"></property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT     s.TransID AS TransactionNo,     CONVERT(int, FORMAT(TRY_CONVERT(date, s.SaleDate, 103), 'yyyyMMdd')) AS DateKey,     dc.CustomerKey,     dp.ProductKey,     'POS' AS SourceSystem,     CAST(s.Qty AS INT) AS Quantity,     CAST(REPLACE(s.Price, ',', '') AS decimal(18,2)) AS UnitPrice,     CAST(s.Qty AS INT) * CAST(REPLACE(s.Price, ',', '') AS decimal(18,2)) AS GrossAmount,     ISNULL(TRY_CAST(REPLACE(REPLACE(s.DiscountVND, CHAR(13), ''), CHAR(10), '') AS decimal(18,2)), 0) AS DiscountAmount,     (CAST(s.Qty AS INT) * CAST(REPLACE(s.Price, ',', '') AS decimal(18,2))) - ISNULL(TRY_CAST(REPLACE(REPLACE(s.DiscountVND, CHAR(13), ''), CHAR(10), '') AS decimal(18,2)), 0) AS NetAmount FROM Retail_DDS.dbo.Stage_POS s JOIN Retail_DDS.dbo.DimCustomer dc ON s.CustID = dc.CustomerCode JOIN Retail_DDS.dbo.DimProduct dp ON s.SKU = dp.ProductCode WHERE CustID IS NOT NULL AND LTRIM(RTRIM(CustID)) &lt;&gt; ''   AND TRY_CAST(Qty AS INT) &gt; 0   AND TRY_CONVERT(date, SaleDate, 103) IS NOT NULL   AND NOT EXISTS (SELECT 1 FROM Retail_DDS.dbo.FactSales fs WHERE fs.TransactionNo = s.TransID)</property>
+                <property
+                  dataType="System.String"
+                  description="The variable that contains the SQL command to be executed."
+                  name="SqlCommandVariable"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">2</property>
+                <property
+                  dataType="System.String"
+                  description="The mappings between the parameters in the SQL command and variables."
+                  name="ParameterMapping"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Load Fact POS\OLE DB Source.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DDS_DST]"
+                  connectionManagerRefId="Package.ConnectionManagers[DDS_DST]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output]"
+                  name="OLE DB Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[TransactionNo]"
+                      length="50"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[TransactionNo]"
+                      name="TransactionNo"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DateKey]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[DateKey]"
+                      name="DateKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerKey]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[CustomerKey]"
+                      name="CustomerKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductKey]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[ProductKey]"
+                      name="ProductKey"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[SourceSystem]"
+                      length="3"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[SourceSystem]"
+                      name="SourceSystem"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]"
+                      dataType="i4"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Quantity]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[Quantity]"
+                      name="Quantity"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[UnitPrice]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[UnitPrice]"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[GrossAmount]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[GrossAmount]"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DiscountAmount]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[DiscountAmount]"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]"
+                      dataType="numeric"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NetAmount]"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].Columns[NetAmount]"
+                      name="NetAmount"
+                      precision="30"
+                      scale="2"
+                      truncationRowDisposition="FailComponent" />
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="50"
+                      name="TransactionNo" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DateKey]"
+                      dataType="i4"
+                      name="DateKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[CustomerKey]"
+                      dataType="i4"
+                      name="CustomerKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[ProductKey]"
+                      dataType="i4"
+                      name="ProductKey" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="3"
+                      name="SourceSystem" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[Quantity]"
+                      dataType="i4"
+                      name="Quantity" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[UnitPrice]"
+                      dataType="numeric"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[GrossAmount]"
+                      dataType="numeric"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[DiscountAmount]"
+                      dataType="numeric"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <externalMetadataColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output].ExternalColumns[NetAmount]"
+                      dataType="numeric"
+                      name="NetAmount"
+                      precision="30"
+                      scale="2" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output]"
+                  isErrorOut="true"
+                  name="OLE DB Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[TransactionNo]"
+                      codePage="1258"
+                      dataType="str"
+                      length="50"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[TransactionNo]"
+                      name="TransactionNo" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DateKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DateKey]"
+                      name="DateKey" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[CustomerKey]"
+                      name="CustomerKey" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductKey]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ProductKey]"
+                      name="ProductKey" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[SourceSystem]"
+                      codePage="1258"
+                      dataType="str"
+                      length="3"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[SourceSystem]"
+                      name="SourceSystem" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Quantity]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[Quantity]"
+                      name="Quantity" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[UnitPrice]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[UnitPrice]"
+                      name="UnitPrice"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[GrossAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[GrossAmount]"
+                      name="GrossAmount"
+                      precision="29"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DiscountAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[DiscountAmount]"
+                      name="DiscountAmount"
+                      precision="18"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NetAmount]"
+                      dataType="numeric"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[NetAmount]"
+                      name="NetAmount"
+                      precision="30"
+                      scale="2" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Load Fact POS.Paths[OLE DB Source Output]"
+              endId="Package\Load Fact POS\OLE DB Destination.Inputs[OLE DB Destination Input]"
+              name="OLE DB Source Output"
+              startId="Package\Load Fact POS\OLE DB Source.Outputs[OLE DB Source Output]" />
+          </paths>
+        </pipeline>
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\08 - Load Fact ERP and Rejected" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Validate ERP (Priority 1), insert valid to FactSales and invalid to ETL_RejectedRows" DTS:DTSID="{53313786-BD81-42F2-8BA7-D18CB1DFE91B}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="08 - Load Fact ERP and Rejected" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Load Rejected and Duplicates"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{A80AD05C-8EDB-4141-9B41-B71F46E0E8A6}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Load Rejected and Duplicates"
+      DTS:ThreadHint="0">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;-- Rejections&#xA;INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason)&#xA;SELECT &apos;ERP&apos;, InvoiceID,&#xA;    CASE &#xA;        WHEN Status &lt;&gt; &apos;Completed&apos; THEN N&apos;Status = Cancelled&apos;&#xA;        WHEN TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 THEN N&apos;QtySold = &apos;&apos;bad&apos;&apos; — không ép được int&apos;&#xA;        WHEN dc.CustomerKey IS NULL THEN N&apos;CustomerID = C999 — không có trong CustomerMaster&apos;&#xA;        WHEN dp.ProductKey IS NULL THEN N&apos;ProductID không có trong ProductMaster&apos;&#xA;    END&#xA;FROM dbo.Stage_ERP s&#xA;LEFT JOIN dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode&#xA;LEFT JOIN dbo.DimProduct dp ON s.ProductID = dp.ProductCode&#xA;WHERE Status &lt;&gt; &apos;Completed&apos; OR TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 OR dc.CustomerKey IS NULL OR dp.ProductKey IS NULL;&#xA;&#xA;-- FactSales&#xA;INSERT INTO dbo.FactSales (TransactionNo, DateKey, CustomerKey, ProductKey, SourceSystem, Quantity, UnitPrice, GrossAmount, DiscountAmount, NetAmount)&#xA;SELECT s.InvoiceID, YEAR(s.InvoiceDate)*10000 + MONTH(s.InvoiceDate)*100 + DAY(s.InvoiceDate), dc.CustomerKey, dp.ProductKey, &apos;ERP&apos;,&#xA;    TRY_CAST(s.QtySold AS INT), s.SalePrice, TRY_CAST(s.QtySold AS INT) * s.SalePrice, ISNULL(s.DiscountMoney, 0),&#xA;    (TRY_CAST(s.QtySold AS INT) * s.SalePrice) - ISNULL(s.DiscountMoney, 0)&#xA;FROM dbo.Stage_ERP s&#xA;JOIN dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode&#xA;JOIN dbo.DimProduct dp ON s.ProductID = dp.ProductCode&#xA;WHERE s.Status = &apos;Completed&apos; AND TRY_CAST(s.QtySold AS INT) &gt; 0;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{00C3652B-B038-4A90-9F9D-370FC671E5CC}"
+          SQLTask:SqlStatementSource="INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ERP', InvoiceID,     CASE WHEN Status &lt;&gt; 'Completed' THEN N'Status = Cancelled'          WHEN TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 THEN N'QtySold = ''bad'' — không ép được int'          WHEN dc.CustomerKey IS NULL THEN N'CustomerID = C999 — không có trong CustomerMaster'          WHEN dp.ProductKey IS NULL THEN N'ProductID không có trong ProductMaster' END FROM RetailPlus_Legacy.dbo.ERP_Sales s LEFT JOIN dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.ProductID = dp.ProductCode WHERE Status &lt;&gt; 'Completed' OR TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 OR dc.CustomerKey IS NULL OR dp.ProductKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'POS', TransID,     CASE WHEN CustID IS NULL OR LTRIM(RTRIM(CustID)) = '' THEN N'Thiếu CustID (customer rỗng)'          WHEN TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0 THEN N'Qty = ''abc'' — không ép được số nguyên'          WHEN TRY_CONVERT(date, SaleDate, 103) IS NULL THEN N'SaleDate = 32/10/2026 — ngày không hợp lệ'          WHEN dp.ProductKey IS NULL THEN N'SKU = P999 — không có trong ProductMaster'          WHEN dc.CustomerKey IS NULL THEN N'CustID không tồn tại trong DimCustomer' END FROM dbo.Stage_POS s LEFT JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode WHERE (CustID IS NULL OR LTRIM(RTRIM(CustID)) = '')    OR (TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0)    OR TRY_CONVERT(date, SaleDate, 103) IS NULL    OR dp.ProductKey IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo,     CASE WHEN s.Status &lt;&gt; 'Completed' THEN N'Status = Cancelled'          WHEN s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '' THEN N'UnitPrice rỗng (NULL)'          WHEN TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0 THEN N'Quantity = -2 (≤ 0)'          WHEN pm.ProductCode IS NULL OR dp.ProductKey IS NULL THEN N'ItemCode = WEB-P999 — map/lookup thất bại'          WHEN cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL THEN N'BuyerCode map thất bại' END FROM dbo.Stage_Online s LEFT JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode LEFT JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode LEFT JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode LEFT JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status &lt;&gt; 'Completed'    OR (s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '')    OR (TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0)    OR pm.ProductCode IS NULL OR dp.ProductKey IS NULL    OR cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo, N'Duplicate TransactionNo' FROM dbo.Stage_Online s JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status = 'Completed'   AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; '')   AND TRY_CAST(s.Quantity AS INT) &gt; 0   AND EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo AND fs.SourceSystem &lt;&gt; 'ONLINE');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\09 - Load Fact POS and Rejected" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Validate POS (Priority 2), insert valid to FactSales and invalid to ETL_RejectedRows" DTS:DTSID="{BF79F10B-BA95-41C8-AE67-C794CE7F5CB8}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="09 - Load Fact POS and Rejected" DTS:ThreadHint="0">
+    <DTS:Executable
+      DTS:refId="Package\Stage POS and Online Sources"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:DTSID="{1B2D8A9A-CDB0-4521-BA36-F4E89B0157E2}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Stage POS and Online Sources"
+      DTS:ThreadHint="0">
       <DTS:Variables />
       <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;-- Rejections&#xA;INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason)&#xA;SELECT &apos;POS&apos;, TransID,&#xA;    CASE &#xA;        WHEN CustID IS NULL OR LTRIM(RTRIM(CustID)) = &apos;&apos; THEN N&apos;Thiếu CustID (customer rỗng)&apos;&#xA;        WHEN TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0 THEN N&apos;Qty = &apos;&apos;abc&apos;&apos; — không ép được số nguyên&apos;&#xA;        WHEN TRY_CONVERT(date, SaleDate, 103) IS NULL THEN N&apos;SaleDate = 32/10/2026 — ngày không hợp lệ&apos;&#xA;        WHEN dp.ProductKey IS NULL THEN N&apos;SKU = P999 — không có trong ProductMaster&apos;&#xA;        WHEN dc.CustomerKey IS NULL THEN N&apos;CustID không tồn tại trong DimCustomer&apos;&#xA;    END&#xA;FROM dbo.Stage_POS s&#xA;LEFT JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode&#xA;LEFT JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode&#xA;WHERE (CustID IS NULL OR LTRIM(RTRIM(CustID)) = &apos;&apos;)&#xA;   OR (TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0)&#xA;   OR TRY_CONVERT(date, SaleDate, 103) IS NULL&#xA;   OR dp.ProductKey IS NULL&#xA;   OR dc.CustomerKey IS NULL;&#xA;&#xA;-- FactSales&#xA;INSERT INTO dbo.FactSales (TransactionNo, DateKey, CustomerKey, ProductKey, SourceSystem, Quantity, UnitPrice, GrossAmount, DiscountAmount, NetAmount)&#xA;SELECT s.TransID, CONVERT(int, FORMAT(TRY_CONVERT(date, s.SaleDate, 103), &apos;yyyyMMdd&apos;)), dc.CustomerKey, dp.ProductKey, &apos;POS&apos;,&#xA;    TRY_CAST(s.Qty AS INT), TRY_CAST(REPLACE(s.Price, &apos;,&apos;, &apos;&apos;) AS decimal(18,2)),&#xA;    TRY_CAST(s.Qty AS INT) * TRY_CAST(REPLACE(s.Price, &apos;,&apos;, &apos;&apos;) AS decimal(18,2)),&#xA;    ISNULL(TRY_CAST(REPLACE(REPLACE(s.DiscountVND, CHAR(13), &apos;&apos;), CHAR(10), &apos;&apos;) AS decimal(18,2)), 0),&#xA;    (TRY_CAST(s.Qty AS INT) * TRY_CAST(REPLACE(s.Price, &apos;,&apos;, &apos;&apos;) AS decimal(18,2))) - ISNULL(TRY_CAST(REPLACE(REPLACE(s.DiscountVND, CHAR(13), &apos;&apos;), CHAR(10), &apos;&apos;) AS decimal(18,2)), 0)&#xA;FROM dbo.Stage_POS s&#xA;JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode&#xA;JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode&#xA;WHERE CustID IS NOT NULL AND LTRIM(RTRIM(CustID)) &lt;&gt; &apos;&apos;&#xA;  AND TRY_CAST(Qty AS INT) &gt; 0&#xA;  AND TRY_CONVERT(date, SaleDate, 103) IS NOT NULL&#xA;  AND dp.ProductKey IS NOT NULL&#xA;  AND dc.CustomerKey IS NOT NULL&#xA;  AND NOT EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.TransID);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
-      </DTS:ObjectData>
-    </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\10 - Load Fact Online and Dedup" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Validate Online (Priority 3), dedup, insert valid unique to FactSales and invalid/duplicate to ETL_RejectedRows" DTS:DTSID="{29522659-4023-422F-9628-645A0BB6FCD1}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="10 - Load Fact Online and Dedup" DTS:ThreadHint="0">
-      <DTS:Variables />
-      <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;-- Rejections&#xA;INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason)&#xA;SELECT &apos;ONLINE&apos;, s.OrderNo,&#xA;    CASE &#xA;        WHEN s.Status &lt;&gt; &apos;Completed&apos; THEN N&apos;Status = Cancelled&apos;&#xA;        WHEN s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = &apos;&apos; THEN N&apos;UnitPrice rỗng (NULL)&apos;&#xA;        WHEN TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0 THEN N&apos;Quantity = -2 (≤ 0)&apos;&#xA;        WHEN pm.ProductCode IS NULL OR dp.ProductKey IS NULL THEN N&apos;ItemCode = WEB-P999 — map/lookup thất bại&apos;&#xA;        WHEN cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL THEN N&apos;BuyerCode map thất bại&apos;&#xA;    END&#xA;FROM dbo.Stage_Online s&#xA;LEFT JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode&#xA;LEFT JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode&#xA;LEFT JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode&#xA;LEFT JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode&#xA;WHERE s.Status &lt;&gt; &apos;Completed&apos;&#xA;   OR (s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = &apos;&apos;)&#xA;   OR (TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0)&#xA;   OR pm.ProductCode IS NULL OR dp.ProductKey IS NULL&#xA;   OR cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL;&#xA;&#xA;-- Duplicates&#xA;INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason)&#xA;SELECT &apos;ONLINE&apos;, s.OrderNo, N&apos;Duplicate TransactionNo&apos;&#xA;FROM dbo.Stage_Online s&#xA;JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode&#xA;JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode&#xA;JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode&#xA;JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode&#xA;WHERE s.Status = &apos;Completed&apos;&#xA;  AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; &apos;&apos;)&#xA;  AND TRY_CAST(s.Quantity AS INT) &gt; 0&#xA;  AND EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo);&#xA;&#xA;-- FactSales&#xA;INSERT INTO dbo.FactSales (TransactionNo, DateKey, CustomerKey, ProductKey, SourceSystem, Quantity, UnitPrice, GrossAmount, DiscountAmount, NetAmount)&#xA;SELECT s.OrderNo, CONVERT(int, FORMAT(TRY_CAST(s.OrderDate AS date), &apos;yyyyMMdd&apos;)), dc.CustomerKey, dp.ProductKey, &apos;ONLINE&apos;,&#xA;    TRY_CAST(s.Quantity AS INT), TRY_CAST(s.UnitPrice AS decimal(18,2)),&#xA;    TRY_CAST(s.Quantity AS INT) * TRY_CAST(s.UnitPrice AS decimal(18,2)),&#xA;    ISNULL(ROUND((TRY_CAST(s.Quantity AS INT) * TRY_CAST(s.UnitPrice AS decimal(18,2))) * (TRY_CAST(s.DiscountPct AS decimal(18,2)) / 100.0), 2), 0),&#xA;    (TRY_CAST(s.Quantity AS INT) * TRY_CAST(s.UnitPrice AS decimal(18,2))) - ISNULL(ROUND((TRY_CAST(s.Quantity AS INT) * TRY_CAST(s.UnitPrice AS decimal(18,2))) * (TRY_CAST(s.DiscountPct AS decimal(18,2)) / 100.0), 2), 0)&#xA;FROM dbo.Stage_Online s&#xA;JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode&#xA;JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode&#xA;JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode&#xA;JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode&#xA;WHERE s.Status = &apos;Completed&apos;&#xA;  AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; &apos;&apos;)&#xA;  AND TRY_CAST(s.Quantity AS INT) &gt; 0&#xA;  AND NOT EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
-      </DTS:ObjectData>
-    </DTS:Executable>
-    <DTS:Executable DTS:refId="Package\11 - Verify Results" DTS:CreationName="Microsoft.ExecuteSQLTask" DTS:Description="Check that FactSales has 29 rows and ETL_RejectedRows has 19 rows" DTS:DTSID="{0586D810-6C34-4A85-A7FB-B0EC89D5F65F}" DTS:ExecutableType="Microsoft.ExecuteSQLTask" DTS:LocaleID="-1" DTS:ObjectName="11 - Verify Results" DTS:ThreadHint="0">
-      <DTS:Variables />
-      <DTS:ObjectData>
-        <SQLTask:SqlTaskData SQLTask:Connection="{E6A413CC-5DF9-468A-A4E2-DA22F1340F5A}" SQLTask:SqlStatementSource="USE Retail_DDS;&#xA;DECLARE @factCnt int, @rejectCnt int;&#xA;SELECT @factCnt = COUNT(*) FROM dbo.FactSales;&#xA;SELECT @rejectCnt = COUNT(*) FROM dbo.ETL_RejectedRows;&#xA;IF @factCnt &lt;&gt; 29 OR @rejectCnt &lt;&gt; 19&#xA;BEGIN&#xA;    RAISERROR(&apos;Verification failed: FactSales=%d (expected 29), Rejected=%d (expected 19)&apos;, 16, 1, @factCnt, @rejectCnt);&#xA;END;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{00C3652B-B038-4A90-9F9D-370FC671E5CC}"
+          SQLTask:SqlStatementSource="BULK INSERT dbo.Stage_POS FROM 'D:\BI_TA2\POS.csv' WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0d0a', FORMAT = 'CSV', FIELDQUOTE = '&quot;'); INSERT INTO dbo.Stage_Online (OrderNo, OrderDate, BuyerCode, ItemCode, Quantity, UnitPrice, DiscountPct, Status) VALUES ('T011', '2026-10-12', 'WEB-C001', 'WEB-P003', '3', '75000', '0', 'Completed'), ('T012', '2026-10-13', 'WEB-C002', 'WEB-P004', '1', '150000', '10', 'Completed'), ('T013', '2026-10-14', 'WEB-C003', 'WEB-P001', '2', NULL, '0', 'Completed'), ('T014', '2026-10-15', 'WEB-C004', 'WEB-P002', '3', '200000', '0', 'Completed'), ('T015', '2026-10-16', 'WEB-C005', 'WEB-P003', '1', '75000', '0', 'Completed'), ('T016', '2026-10-17', 'WEB-C001', 'WEB-P004', '2', '150000', '10', 'Completed'), ('T017', '2026-10-18', 'WEB-C002', 'WEB-P001', '3', '100000', '0', 'Completed'), ('T018', '2026-10-19', 'WEB-C003', 'WEB-P002', '-2', '200000', '0', 'Completed'), ('T019', '2026-10-20', 'WEB-C004', 'WEB-P003', '2', '75000', '0', 'Completed'), ('T020', '2026-10-01', 'WEB-C005', 'WEB-P004', '3', '150000', '10', 'Completed'), ('T021', '2026-10-02', 'WEB-C001', 'WEB-P001', '1', '100000', '0', 'Cancelled'), ('T022', '2026-10-03', 'WEB-C002', 'WEB-P002', '2', '200000', '0', 'Completed'), ('T023', '2026-10-04', 'WEB-C003', 'WEB-P003', '3', '75000', '0', 'Completed'), ('T024', '2026-10-05', 'WEB-C004', 'WEB-P999', '1', '150000', '10', 'Completed'), ('T025', '2026-10-06', 'WEB-C005', 'WEB-P001', '2', '100000', '0', 'Completed'), ('T026', '2026-10-07', 'WEB-C001', 'WEB-P002', '3', '200000', '0', 'Completed');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
   </DTS:Executables>
   <DTS:PrecedenceConstraints>
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 0]" DTS:CreationName="" DTS:DTSID="{72E7335D-DD8E-4F86-B52B-AEA2A3A859ED}" DTS:From="Package\01 - Setup and Clear DDS" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 0" DTS:To="Package\02 - Load DimDate" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 1]" DTS:CreationName="" DTS:DTSID="{699CDE9D-DF1A-4764-8B0B-668C19ABA78E}" DTS:From="Package\02 - Load DimDate" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 1" DTS:To="Package\03 - Load DimCustomer" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 2]" DTS:CreationName="" DTS:DTSID="{A8F0C1B2-C716-466A-B3C9-750060049181}" DTS:From="Package\03 - Load DimCustomer" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 2" DTS:To="Package\04 - Load DimProduct" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 3]" DTS:CreationName="" DTS:DTSID="{504A5D94-4AF1-41EC-9276-C76121D103EC}" DTS:From="Package\04 - Load DimProduct" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 3" DTS:To="Package\05 - Extract POS to Stage" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 4]" DTS:CreationName="" DTS:DTSID="{1096B397-4035-44F9-8FB0-F501D2F14ACB}" DTS:From="Package\05 - Extract POS to Stage" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 4" DTS:To="Package\06 - Extract Online to Stage" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 5]" DTS:CreationName="" DTS:DTSID="{5CA96077-54BA-46C8-88BD-706F9C7D85D3}" DTS:From="Package\06 - Extract Online to Stage" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 5" DTS:To="Package\07 - Extract ERP to Stage" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 6]" DTS:CreationName="" DTS:DTSID="{B063CF4A-86E6-4682-9422-16FB86DBEA26}" DTS:From="Package\07 - Extract ERP to Stage" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 6" DTS:To="Package\08 - Load Fact ERP and Rejected" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 7]" DTS:CreationName="" DTS:DTSID="{5D79A238-CCE4-4934-B1A0-6F13148FDD6B}" DTS:From="Package\08 - Load Fact ERP and Rejected" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 7" DTS:To="Package\09 - Load Fact POS and Rejected" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 8]" DTS:CreationName="" DTS:DTSID="{551651E5-FAF0-4222-8516-E709C843688C}" DTS:From="Package\09 - Load Fact POS and Rejected" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 8" DTS:To="Package\10 - Load Fact Online and Dedup" />
-    <DTS:PrecedenceConstraint DTS:refId="Package.PrecedenceConstraints[Constraint 9]" DTS:CreationName="" DTS:DTSID="{974EC229-633E-4CFC-B010-24B76F227916}" DTS:From="Package\10 - Load Fact Online and Dedup" DTS:LogicalAnd="True" DTS:ObjectName="Constraint 9" DTS:To="Package\11 - Verify Results" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{001965CF-8349-4A0E-9D5A-51F1F8D80C39\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{001965CF-8349-4A0E-9D5A-51F1F8D80C39}"
+      DTS:From="Package\Load DimProduct"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{001965CF-8349-4A0E-9D5A-51F1F8D80C39}"
+      DTS:To="Package\Load Fact ERP" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{50062888-99A6-44AE-BB9D-B7B3FA225522\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{50062888-99A6-44AE-BB9D-B7B3FA225522}"
+      DTS:From="Package\Load DimDate"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{50062888-99A6-44AE-BB9D-B7B3FA225522}"
+      DTS:To="Package\Load DimCustomer" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{66FBDFF5-4413-4C6A-8037-C3D6F80166B5\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{66FBDFF5-4413-4C6A-8037-C3D6F80166B5}"
+      DTS:From="Package\Clear DDS"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{66FBDFF5-4413-4C6A-8037-C3D6F80166B5}"
+      DTS:To="Package\Load DimDate" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{72FE307B-E1C9-4AD0-A567-BB16904913D4\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{72FE307B-E1C9-4AD0-A567-BB16904913D4}"
+      DTS:From="Package\Load DimCustomer"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{72FE307B-E1C9-4AD0-A567-BB16904913D4}"
+      DTS:To="Package\Load DimProduct" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{766F553C-6D31-45C1-8CA8-1762D8E7483F\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{766F553C-6D31-45C1-8CA8-1762D8E7483F}"
+      DTS:From="Package\Stage POS and Online Sources"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{766F553C-6D31-45C1-8CA8-1762D8E7483F}"
+      DTS:To="Package\Load Fact POS" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{8C9D08BE-796E-4D36-BE10-7ED3973F2DED\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{8C9D08BE-796E-4D36-BE10-7ED3973F2DED}"
+      DTS:From="Package\Load Fact POS"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{8C9D08BE-796E-4D36-BE10-7ED3973F2DED}"
+      DTS:To="Package\Load Fact Online" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{D2F325D0-C067-40E5-A2E3-A28C0D68A5D0\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{D2F325D0-C067-40E5-A2E3-A28C0D68A5D0}"
+      DTS:From="Package\Load Fact ERP"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{D2F325D0-C067-40E5-A2E3-A28C0D68A5D0}"
+      DTS:To="Package\Stage POS and Online Sources" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{D8A1F0FC-5525-4A9F-8E4C-424AA2F7C04D\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{D8A1F0FC-5525-4A9F-8E4C-424AA2F7C04D}"
+      DTS:From="Package\Load Fact Online"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{D8A1F0FC-5525-4A9F-8E4C-424AA2F7C04D}"
+      DTS:To="Package\Load Rejected and Duplicates" />
   </DTS:PrecedenceConstraints>
-  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
-<Package design-time-name="Package">
-  <LayoutInfo>
-    <GraphLayout Capacity="32" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
-      <NodeLayout Size="250,42" Id="Package\01 - Setup and Clear DDS" TopLeft="60,40" />
-      <NodeLayout Size="250,42" Id="Package\02 - Load DimDate" TopLeft="60,125" />
-      <NodeLayout Size="250,42" Id="Package\03 - Load DimCustomer" TopLeft="60,210" />
-      <NodeLayout Size="250,42" Id="Package\04 - Load DimProduct" TopLeft="60,295" />
-      <NodeLayout Size="250,42" Id="Package\05 - Extract POS to Stage" TopLeft="60,380" />
-      <NodeLayout Size="250,42" Id="Package\06 - Extract Online to Stage" TopLeft="60,465" />
-      <NodeLayout Size="250,42" Id="Package\07 - Extract ERP to Stage" TopLeft="380,40" />
-      <NodeLayout Size="250,42" Id="Package\08 - Load Fact ERP and Rejected" TopLeft="380,125" />
-      <NodeLayout Size="250,42" Id="Package\09 - Load Fact POS and Rejected" TopLeft="380,210" />
-      <NodeLayout Size="250,42" Id="Package\10 - Load Fact Online and Dedup" TopLeft="380,295" />
-      <NodeLayout Size="250,42" Id="Package\11 - Verify Results" TopLeft="380,380" />
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 0]" TopLeft="185,82">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 1]" TopLeft="185,167">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 2]" TopLeft="185,252">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 3]" TopLeft="185,337">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 4]" TopLeft="185,422">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 5]" TopLeft="185,507">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="320,-467" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 6]" TopLeft="505,82">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 7]" TopLeft="505,167">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 8]" TopLeft="505,252">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-      <EdgeLayout Id="Package.PrecedenceConstraints[Constraint 9]" TopLeft="505,337">
-        <EdgeLayout.Curve>
-          <mssgle:Curve StartConnector="{assembly:Null}" EndConnector="0,43" Segments="null" />
-        </EdgeLayout.Curve>
-        <EdgeLayout.Labels>
-          <EdgeLabelCollection />
-        </EdgeLayout.Labels>
-      </EdgeLayout>
-    </GraphLayout>
-  </LayoutInfo>
-</Package>]]></DTS:DesignTimeProperties>
 </DTS:Executable>
