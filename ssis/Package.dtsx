@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
 <DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
   DTS:refId="Package"
-  DTS:CreationDate="11/20/2026 9:36:48 AM"
+  DTS:CreationDate="11/20/2026 10:07:47 AM"
   DTS:CreationName="Microsoft.Package"
   DTS:CreatorComputerName="LAPTOP-7IRDHAGI"
   DTS:CreatorName="LAPTOP-7IRDHAGI\ASUS"
-  DTS:DTSID="{05A47202-75B9-4241-91EC-08FB0FB8AD24}"
+  DTS:DTSID="{305CC022-47BA-4F1F-81D4-CDEF5DB6A33D}"
   DTS:ExecutableType="Microsoft.Package"
   DTS:LastModifiedProductVersion="16.0.1000.6"
   DTS:LocaleID="1033"
   DTS:ObjectName="Retail_ETL_Package"
-  DTS:VersionGUID="{92612DCA-5A19-43B2-984A-6770BC5C3F80}">
+  DTS:VersionGUID="{DC7E5BC8-4663-48B2-9ED5-F89A736D33FC}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
     <DTS:ConnectionManager
       DTS:refId="Package.ConnectionManagers[DDS_DST]"
       DTS:CreationName="OLEDB"
-      DTS:DTSID="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
+      DTS:DTSID="{41449918-9131-4860-AAF3-27FE57B87E83}"
       DTS:ObjectName="DDS_DST">
       <DTS:ObjectData>
         <DTS:ConnectionManager
@@ -29,7 +29,7 @@
     <DTS:ConnectionManager
       DTS:refId="Package.ConnectionManagers[ERP_SRC]"
       DTS:CreationName="OLEDB"
-      DTS:DTSID="{4411560E-E932-41B8-9069-52EC2577E37C}"
+      DTS:DTSID="{21BC3952-AC6B-4BF8-B0D2-5DB031873924}"
       DTS:ObjectName="ERP_SRC">
       <DTS:ObjectData>
         <DTS:ConnectionManager
@@ -44,7 +44,7 @@
     <DTS:Executable
       DTS:refId="Package\Clear DDS"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
-      DTS:DTSID="{9ECB3710-4E69-486A-A279-55A52F7C57F6}"
+      DTS:DTSID="{0B0A7C96-C091-41CB-AE4C-2DFDB3CDADBA}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Clear DDS"
@@ -52,14 +52,14 @@
       <DTS:Variables />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
+          SQLTask:Connection="{41449918-9131-4860-AAF3-27FE57B87E83}"
           SQLTask:SqlStatementSource="DELETE FROM dbo.FactSales; DELETE FROM dbo.ETL_RejectedRows; DELETE FROM dbo.DimProduct; DELETE FROM dbo.DimCustomer; DELETE FROM dbo.DimDate; IF OBJECT_ID('dbo.Stage_POS', 'U') IS NULL CREATE TABLE dbo.Stage_POS (TransID varchar(50), SaleDate varchar(50), CustID varchar(50), SKU varchar(50), Qty varchar(50), Price varchar(50), DiscountVND varchar(50)); IF OBJECT_ID('dbo.Stage_Online', 'U') IS NULL CREATE TABLE dbo.Stage_Online (OrderNo varchar(50), OrderDate varchar(50), BuyerCode varchar(50), ItemCode varchar(50), Quantity varchar(50), UnitPrice varchar(50), DiscountPct varchar(50), Status varchar(50)); IF OBJECT_ID('dbo.Stage_ERP', 'U') IS NULL CREATE TABLE dbo.Stage_ERP (InvoiceID varchar(50), InvoiceDate datetime2, CustomerID varchar(50), ProductID varchar(50), QtySold varchar(50), SalePrice decimal(18,2), DiscountMoney decimal(18,2), Status varchar(50)); TRUNCATE TABLE dbo.Stage_POS; TRUNCATE TABLE dbo.Stage_Online; TRUNCATE TABLE dbo.Stage_ERP;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
       DTS:refId="Package\Load DimCustomer"
       DTS:CreationName="Microsoft.Pipeline"
-      DTS:DTSID="{4677368B-B14B-44A4-A6A9-995B1AD44C4D}"
+      DTS:DTSID="{D376124A-888C-44AE-810E-5EB2D0C62C85}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load DimCustomer"
@@ -382,7 +382,7 @@
     <DTS:Executable
       DTS:refId="Package\Load DimDate"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
-      DTS:DTSID="{89A012A1-4093-418A-A7FC-08ADE5E7EB55}"
+      DTS:DTSID="{E500A545-2DBA-44FF-B6FA-D5AA56AA0F69}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load DimDate"
@@ -390,14 +390,14 @@
       <DTS:Variables />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
+          SQLTask:Connection="{41449918-9131-4860-AAF3-27FE57B87E83}"
           SQLTask:SqlStatementSource="DECLARE @d date = '2026-10-01'; WHILE @d &lt;= '2026-10-31' BEGIN INSERT INTO dbo.DimDate (DateKey, FullDate, [Month], [Quarter], [Year]) VALUES (YEAR(@d)*10000 + MONTH(@d)*100 + DAY(@d), @d, MONTH(@d), DATEPART(QUARTER, @d), YEAR(@d)); SET @d = DATEADD(DAY, 1, @d); END;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
       DTS:refId="Package\Load DimProduct"
       DTS:CreationName="Microsoft.Pipeline"
-      DTS:DTSID="{90C62E23-EDF8-45D1-B792-F89C79EE8936}"
+      DTS:DTSID="{D05077C7-B693-403B-A7BA-0FA83DAD543D}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load DimProduct"
@@ -720,7 +720,7 @@
     <DTS:Executable
       DTS:refId="Package\Load Fact ERP"
       DTS:CreationName="Microsoft.Pipeline"
-      DTS:DTSID="{CEDBD98E-AB78-4859-ACEF-39587724D194}"
+      DTS:DTSID="{8A88AB73-78E2-4272-B6AC-16CC66D84294}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load Fact ERP"
@@ -943,7 +943,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -1013,7 +1013,6 @@
                 <output
                   refId="Package\Load Fact ERP\Lookup DimCustomer.Outputs[Lookup Match Output]"
                   errorOrTruncationOperation="Lookup"
-                  errorRowDisposition="FailComponent"
                   exclusionGroup="1"
                   name="Lookup Match Output"
                   synchronousInputId="Package\Load Fact ERP\Lookup DimCustomer.Inputs[Lookup Input]">
@@ -1101,7 +1100,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -1171,7 +1170,6 @@
                 <output
                   refId="Package\Load Fact ERP\Lookup DimProduct.Outputs[Lookup Match Output]"
                   errorOrTruncationOperation="Lookup"
-                  errorRowDisposition="FailComponent"
                   exclusionGroup="1"
                   name="Lookup Match Output"
                   synchronousInputId="Package\Load Fact ERP\Lookup DimProduct.Inputs[Lookup Input]">
@@ -1731,7 +1729,7 @@
     <DTS:Executable
       DTS:refId="Package\Load Fact Online"
       DTS:CreationName="Microsoft.Pipeline"
-      DTS:DTSID="{16B90F10-3723-47D5-AEFB-95876373BAA8}"
+      DTS:DTSID="{9A462A3E-FFA7-42C6-9532-C56CB09F062F}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load Fact Online"
@@ -1953,7 +1951,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -2023,7 +2021,6 @@
                 <output
                   refId="Package\Load Fact Online\Lookup DimCustomer.Outputs[Lookup Match Output]"
                   errorOrTruncationOperation="Lookup"
-                  errorRowDisposition="FailComponent"
                   exclusionGroup="1"
                   name="Lookup Match Output"
                   synchronousInputId="Package\Load Fact Online\Lookup DimCustomer.Inputs[Lookup Input]">
@@ -2111,7 +2108,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -2181,7 +2178,6 @@
                 <output
                   refId="Package\Load Fact Online\Lookup DimProduct.Outputs[Lookup Match Output]"
                   errorOrTruncationOperation="Lookup"
-                  errorRowDisposition="FailComponent"
                   exclusionGroup="1"
                   name="Lookup Match Output"
                   synchronousInputId="Package\Load Fact Online\Lookup DimProduct.Inputs[Lookup Input]">
@@ -2738,7 +2734,7 @@
     <DTS:Executable
       DTS:refId="Package\Load Fact POS"
       DTS:CreationName="Microsoft.Pipeline"
-      DTS:DTSID="{99104006-0B30-448C-934B-BC2809EED08A}"
+      DTS:DTSID="{AED01862-1AAD-4A6B-ADB7-5080040449A0}"
       DTS:ExecutableType="Microsoft.Pipeline"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load Fact POS"
@@ -2960,7 +2956,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -3030,7 +3026,6 @@
                 <output
                   refId="Package\Load Fact POS\Lookup DimCustomer.Outputs[Lookup Match Output]"
                   errorOrTruncationOperation="Lookup"
-                  errorRowDisposition="FailComponent"
                   exclusionGroup="1"
                   name="Lookup Match Output"
                   synchronousInputId="Package\Load Fact POS\Lookup DimCustomer.Inputs[Lookup Input]">
@@ -3118,7 +3113,7 @@
                   dataType="System.Int32"
                   description="Specifies how the Lookup transformation handles rows without matching entries in the reference data set."
                   name="NoMatchBehavior"
-                  typeConverter="LookupNoMatchBehavior">0</property>
+                  typeConverter="LookupNoMatchBehavior">1</property>
                 <property
                   dataType="System.Int32"
                   description="Specifies the percentage of the cache that is allocated for rows with no matching entries in the reference dataset."
@@ -3188,7 +3183,6 @@
                 <output
                   refId="Package\Load Fact POS\Lookup DimProduct.Outputs[Lookup Match Output]"
                   errorOrTruncationOperation="Lookup"
-                  errorRowDisposition="FailComponent"
                   exclusionGroup="1"
                   name="Lookup Match Output"
                   synchronousInputId="Package\Load Fact POS\Lookup DimProduct.Inputs[Lookup Input]">
@@ -3745,7 +3739,7 @@
     <DTS:Executable
       DTS:refId="Package\Load Rejected and Duplicates"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
-      DTS:DTSID="{4F869B6A-9F49-4F22-8179-DD7832024BD6}"
+      DTS:DTSID="{0A9212D6-CA9E-4A03-97F9-47969EAB5D4F}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Load Rejected and Duplicates"
@@ -3753,14 +3747,14 @@
       <DTS:Variables />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
+          SQLTask:Connection="{41449918-9131-4860-AAF3-27FE57B87E83}"
           SQLTask:SqlStatementSource="INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ERP', InvoiceID,     CASE WHEN Status &lt;&gt; 'Completed' THEN N'Status = Cancelled'          WHEN TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 THEN N'QtySold = ''bad'' — không ép được int'          WHEN dc.CustomerKey IS NULL THEN N'CustomerID = C999 — không có trong CustomerMaster'          WHEN dp.ProductKey IS NULL THEN N'ProductID không có trong ProductMaster' END FROM RetailPlus_Legacy.dbo.ERP_Sales s LEFT JOIN dbo.DimCustomer dc ON s.CustomerID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.ProductID = dp.ProductCode WHERE Status &lt;&gt; 'Completed' OR TRY_CAST(QtySold AS INT) IS NULL OR TRY_CAST(QtySold AS INT) &lt;= 0 OR dc.CustomerKey IS NULL OR dp.ProductKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'POS', TransID,     CASE WHEN CustID IS NULL OR LTRIM(RTRIM(CustID)) = '' THEN N'Thiếu CustID (customer rỗng)'          WHEN TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0 THEN N'Qty = ''abc'' — không ép được số nguyên'          WHEN TRY_CONVERT(date, SaleDate, 103) IS NULL THEN N'SaleDate = 32/10/2026 — ngày không hợp lệ'          WHEN dp.ProductKey IS NULL THEN N'SKU = P999 — không có trong ProductMaster'          WHEN dc.CustomerKey IS NULL THEN N'CustID không tồn tại trong DimCustomer' END FROM dbo.Stage_POS s LEFT JOIN dbo.DimCustomer dc ON s.CustID = dc.CustomerCode LEFT JOIN dbo.DimProduct dp ON s.SKU = dp.ProductCode WHERE (CustID IS NULL OR LTRIM(RTRIM(CustID)) = '')    OR (TRY_CAST(Qty AS INT) IS NULL OR TRY_CAST(Qty AS INT) &lt;= 0)    OR TRY_CONVERT(date, SaleDate, 103) IS NULL    OR dp.ProductKey IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo,     CASE WHEN s.Status &lt;&gt; 'Completed' THEN N'Status = Cancelled'          WHEN s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '' THEN N'UnitPrice rỗng (NULL)'          WHEN TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0 THEN N'Quantity = -2 (≤ 0)'          WHEN pm.ProductCode IS NULL OR dp.ProductKey IS NULL THEN N'ItemCode = WEB-P999 — map/lookup thất bại'          WHEN cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL THEN N'BuyerCode map thất bại' END FROM dbo.Stage_Online s LEFT JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode LEFT JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode LEFT JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode LEFT JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status &lt;&gt; 'Completed'    OR (s.UnitPrice IS NULL OR LTRIM(RTRIM(s.UnitPrice)) = '')    OR (TRY_CAST(s.Quantity AS INT) IS NULL OR TRY_CAST(s.Quantity AS INT) &lt;= 0)    OR pm.ProductCode IS NULL OR dp.ProductKey IS NULL    OR cm.CustomerCode IS NULL OR dc.CustomerKey IS NULL; INSERT INTO dbo.ETL_RejectedRows (SourceSystem, TransactionNo, RejectReason) SELECT 'ONLINE', s.OrderNo, N'Duplicate TransactionNo' FROM dbo.Stage_Online s JOIN RetailPlus_Legacy.dbo.CustomerMap cm ON s.BuyerCode = cm.SourceCode JOIN dbo.DimCustomer dc ON cm.CustomerCode = dc.CustomerCode JOIN RetailPlus_Legacy.dbo.ProductMap pm ON s.ItemCode = pm.SourceCode JOIN dbo.DimProduct dp ON pm.ProductCode = dp.ProductCode WHERE s.Status = 'Completed'   AND (s.UnitPrice IS NOT NULL AND LTRIM(RTRIM(s.UnitPrice)) &lt;&gt; '')   AND TRY_CAST(s.Quantity AS INT) &gt; 0   AND EXISTS (SELECT 1 FROM dbo.FactSales fs WHERE fs.TransactionNo = s.OrderNo AND fs.SourceSystem &lt;&gt; 'ONLINE');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
     <DTS:Executable
       DTS:refId="Package\Stage POS and Online Sources"
       DTS:CreationName="Microsoft.ExecuteSQLTask"
-      DTS:DTSID="{A5FF8D71-AABC-4257-BA5F-36DC00495725}"
+      DTS:DTSID="{8D31BAF8-770E-40FD-ACA1-687DB3893E01}"
       DTS:ExecutableType="Microsoft.ExecuteSQLTask"
       DTS:LocaleID="-1"
       DTS:ObjectName="Stage POS and Online Sources"
@@ -3768,75 +3762,75 @@
       <DTS:Variables />
       <DTS:ObjectData>
         <SQLTask:SqlTaskData
-          SQLTask:Connection="{4C110C6E-C6B5-4CCC-BCA2-17CF85212269}"
+          SQLTask:Connection="{41449918-9131-4860-AAF3-27FE57B87E83}"
           SQLTask:SqlStatementSource="BULK INSERT dbo.Stage_POS FROM 'D:\BI_TA2\POS.csv' WITH (FIRSTROW = 2, FIELDTERMINATOR = ',', ROWTERMINATOR = '0x0d0a', FORMAT = 'CSV', FIELDQUOTE = '&quot;'); INSERT INTO dbo.Stage_Online (OrderNo, OrderDate, BuyerCode, ItemCode, Quantity, UnitPrice, DiscountPct, Status) VALUES ('T011', '2026-10-12', 'WEB-C001', 'WEB-P003', '3', '75000', '0', 'Completed'), ('T012', '2026-10-13', 'WEB-C002', 'WEB-P004', '1', '150000', '10', 'Completed'), ('T013', '2026-10-14', 'WEB-C003', 'WEB-P001', '2', NULL, '0', 'Completed'), ('T014', '2026-10-15', 'WEB-C004', 'WEB-P002', '3', '200000', '0', 'Completed'), ('T015', '2026-10-16', 'WEB-C005', 'WEB-P003', '1', '75000', '0', 'Completed'), ('T016', '2026-10-17', 'WEB-C001', 'WEB-P004', '2', '150000', '10', 'Completed'), ('T017', '2026-10-18', 'WEB-C002', 'WEB-P001', '3', '100000', '0', 'Completed'), ('T018', '2026-10-19', 'WEB-C003', 'WEB-P002', '-2', '200000', '0', 'Completed'), ('T019', '2026-10-20', 'WEB-C004', 'WEB-P003', '2', '75000', '0', 'Completed'), ('T020', '2026-10-01', 'WEB-C005', 'WEB-P004', '3', '150000', '10', 'Completed'), ('T021', '2026-10-02', 'WEB-C001', 'WEB-P001', '1', '100000', '0', 'Cancelled'), ('T022', '2026-10-03', 'WEB-C002', 'WEB-P002', '2', '200000', '0', 'Completed'), ('T023', '2026-10-04', 'WEB-C003', 'WEB-P003', '3', '75000', '0', 'Completed'), ('T024', '2026-10-05', 'WEB-C004', 'WEB-P999', '1', '150000', '10', 'Completed'), ('T025', '2026-10-06', 'WEB-C005', 'WEB-P001', '2', '100000', '0', 'Completed'), ('T026', '2026-10-07', 'WEB-C001', 'WEB-P002', '3', '200000', '0', 'Completed');" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
       </DTS:ObjectData>
     </DTS:Executable>
   </DTS:Executables>
   <DTS:PrecedenceConstraints>
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{2A7D1D31-E132-460B-88F9-22AF57D39DEB\}]"
+      DTS:refId="Package.PrecedenceConstraints[{181817C4-0977-4A59-A17C-35FFB9BE7100\}]"
       DTS:CreationName=""
-      DTS:DTSID="{2A7D1D31-E132-460B-88F9-22AF57D39DEB}"
-      DTS:From="Package\Load DimDate"
-      DTS:LogicalAnd="True"
-      DTS:ObjectName="{2A7D1D31-E132-460B-88F9-22AF57D39DEB}"
-      DTS:To="Package\Load DimCustomer" />
-    <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{5F66FA6E-39B9-43DE-9A62-5E367FFD33EB\}]"
-      DTS:CreationName=""
-      DTS:DTSID="{5F66FA6E-39B9-43DE-9A62-5E367FFD33EB}"
-      DTS:From="Package\Stage POS and Online Sources"
-      DTS:LogicalAnd="True"
-      DTS:ObjectName="{5F66FA6E-39B9-43DE-9A62-5E367FFD33EB}"
-      DTS:To="Package\Load Fact POS" />
-    <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{69D8BC80-1B5B-4F8D-84AB-7F36BAFCBCCB\}]"
-      DTS:CreationName=""
-      DTS:DTSID="{69D8BC80-1B5B-4F8D-84AB-7F36BAFCBCCB}"
+      DTS:DTSID="{181817C4-0977-4A59-A17C-35FFB9BE7100}"
       DTS:From="Package\Load Fact Online"
       DTS:LogicalAnd="True"
-      DTS:ObjectName="{69D8BC80-1B5B-4F8D-84AB-7F36BAFCBCCB}"
+      DTS:ObjectName="{181817C4-0977-4A59-A17C-35FFB9BE7100}"
       DTS:To="Package\Load Rejected and Duplicates" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{6B4FA9ED-7160-400B-9A0C-E38781807491\}]"
+      DTS:refId="Package.PrecedenceConstraints[{7183DC1E-9597-4F11-AE82-6584A301FAF3\}]"
       DTS:CreationName=""
-      DTS:DTSID="{6B4FA9ED-7160-400B-9A0C-E38781807491}"
-      DTS:From="Package\Load DimCustomer"
-      DTS:LogicalAnd="True"
-      DTS:ObjectName="{6B4FA9ED-7160-400B-9A0C-E38781807491}"
-      DTS:To="Package\Load DimProduct" />
-    <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{916DAE09-5911-4A15-B8AC-D3EA8DFCC643\}]"
-      DTS:CreationName=""
-      DTS:DTSID="{916DAE09-5911-4A15-B8AC-D3EA8DFCC643}"
+      DTS:DTSID="{7183DC1E-9597-4F11-AE82-6584A301FAF3}"
       DTS:From="Package\Load Fact ERP"
       DTS:LogicalAnd="True"
-      DTS:ObjectName="{916DAE09-5911-4A15-B8AC-D3EA8DFCC643}"
+      DTS:ObjectName="{7183DC1E-9597-4F11-AE82-6584A301FAF3}"
       DTS:To="Package\Stage POS and Online Sources" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{9FC848B8-DA12-4E9E-9600-920CD5B1EDBD\}]"
+      DTS:refId="Package.PrecedenceConstraints[{7DC66744-C740-4DAF-82D2-C5C42233C1A6\}]"
       DTS:CreationName=""
-      DTS:DTSID="{9FC848B8-DA12-4E9E-9600-920CD5B1EDBD}"
+      DTS:DTSID="{7DC66744-C740-4DAF-82D2-C5C42233C1A6}"
       DTS:From="Package\Load DimProduct"
       DTS:LogicalAnd="True"
-      DTS:ObjectName="{9FC848B8-DA12-4E9E-9600-920CD5B1EDBD}"
+      DTS:ObjectName="{7DC66744-C740-4DAF-82D2-C5C42233C1A6}"
       DTS:To="Package\Load Fact ERP" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{B1FD932B-0A01-49C9-8783-8F785C9CFED7\}]"
+      DTS:refId="Package.PrecedenceConstraints[{CB87A2DA-2850-463A-AF72-C605ED893395\}]"
       DTS:CreationName=""
-      DTS:DTSID="{B1FD932B-0A01-49C9-8783-8F785C9CFED7}"
+      DTS:DTSID="{CB87A2DA-2850-463A-AF72-C605ED893395}"
+      DTS:From="Package\Stage POS and Online Sources"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{CB87A2DA-2850-463A-AF72-C605ED893395}"
+      DTS:To="Package\Load Fact POS" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{CD0B2266-5756-488D-AC65-31E570FE26FD\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{CD0B2266-5756-488D-AC65-31E570FE26FD}"
+      DTS:From="Package\Load DimCustomer"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{CD0B2266-5756-488D-AC65-31E570FE26FD}"
+      DTS:To="Package\Load DimProduct" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{E7323B7D-2E35-4628-AEA2-12B1D3741B9D\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{E7323B7D-2E35-4628-AEA2-12B1D3741B9D}"
       DTS:From="Package\Load Fact POS"
       DTS:LogicalAnd="True"
-      DTS:ObjectName="{B1FD932B-0A01-49C9-8783-8F785C9CFED7}"
+      DTS:ObjectName="{E7323B7D-2E35-4628-AEA2-12B1D3741B9D}"
       DTS:To="Package\Load Fact Online" />
     <DTS:PrecedenceConstraint
-      DTS:refId="Package.PrecedenceConstraints[{F07C4337-495C-4082-9AD2-15B5CB2CADDD\}]"
+      DTS:refId="Package.PrecedenceConstraints[{EEAF2776-C830-4516-954D-0AB08BF25825\}]"
       DTS:CreationName=""
-      DTS:DTSID="{F07C4337-495C-4082-9AD2-15B5CB2CADDD}"
+      DTS:DTSID="{EEAF2776-C830-4516-954D-0AB08BF25825}"
+      DTS:From="Package\Load DimDate"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="{EEAF2776-C830-4516-954D-0AB08BF25825}"
+      DTS:To="Package\Load DimCustomer" />
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[{F6DF53C8-A983-4526-9E16-E96C2256C02E\}]"
+      DTS:CreationName=""
+      DTS:DTSID="{F6DF53C8-A983-4526-9E16-E96C2256C02E}"
       DTS:From="Package\Clear DDS"
       DTS:LogicalAnd="True"
-      DTS:ObjectName="{F07C4337-495C-4082-9AD2-15B5CB2CADDD}"
+      DTS:ObjectName="{F6DF53C8-A983-4526-9E16-E96C2256C02E}"
       DTS:To="Package\Load DimDate" />
   </DTS:PrecedenceConstraints>
 </DTS:Executable>
