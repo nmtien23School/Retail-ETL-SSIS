@@ -1,0 +1,13 @@
+# Default: auto-detect text, normalize to LF in repo
+* text=auto
+
+# Source code / scripts
+*.sql  text eol=crlf
+*.csv  text eol=crlf
+*.md   text eol=lf
+
+# Binary
+*.xlsx binary
+*.xls  binary
+*.mdf  binary
+*.ldf  binary

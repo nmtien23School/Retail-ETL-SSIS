@@ -1,0 +1,27 @@
+# Excel lock/temp files
+~$*
+*.tmp
+*.bak
+
+# Legacy root copies (canonical files live in data/)
+/POS.csv
+/Online.xlsx
+
+# SSIS / Visual Studio build output
+[Bb]in/
+[Oo]bj/
+.vs/
+*.suo
+*.user
+*.userosscache
+
+# SQL Server
+*.mdf
+*.ldf
+*.ndf
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+*.log
